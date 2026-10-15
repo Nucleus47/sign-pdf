@@ -12,11 +12,10 @@ human and to nothing else.
 
 The command-line tool in [`../cli`](../cli/README.md) offers the same steps as commands.
 
-The npm package is not published yet. Build from a checkout (below) until it is. Once it
-is published, install and run without a checkout:
+Install and run it from npm. Keep the `@latest` tag, so `npx` checks for a newer version each time:
 
 ```bash
-npx -y @sign-pdf/mcp
+npx -y @sign-pdf/mcp@latest
 ```
 
 Requires Node.js 22 or later. For the complete one-read agent workflow, see the
@@ -42,14 +41,14 @@ stdout. Most clients read a JSON configuration like this one:
   "mcpServers": {
     "sign-pdf": {
       "command": "npx",
-      "args": ["-y", "@sign-pdf/mcp"]
+      "args": ["-y", "@sign-pdf/mcp@latest"]
     }
   }
 }
 ```
 
 A client that registers servers from the command line takes the same command, for
-example `claude mcp add sign-pdf -- npx -y @sign-pdf/mcp`. For a checkout build, replace
+example `claude mcp add sign-pdf -- npx -y @sign-pdf/mcp@latest`. For a checkout build, replace
 that command with `node /absolute/path/to/workspace/packages/mcp/dist/bin.js`.
 
 The server stops when the client closes stdin or sends SIGINT or SIGTERM. Every

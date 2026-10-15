@@ -9,11 +9,10 @@ that takes a signature, a signature image or a typed name.
 
 The MCP server in [`../mcp`](../mcp/README.md) offers the same steps as MCP tools.
 
-The npm package is not published yet. Build from a checkout (below) until it is. Once it
-is published, install and run without a checkout:
+Install and run it from npm. Keep the `@latest` tag, so `npx` checks for a newer version each time:
 
 ```bash
-npx -y @sign-pdf/cli --help
+npx -y @sign-pdf/cli@latest --help
 ```
 
 Requires Node.js 22 or later.
