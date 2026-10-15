@@ -20,6 +20,13 @@ const FRAGMENT_END = new Set([
 /** Names that form tools write when a field has no real name. */
 const PLACEHOLDER = /^(undefined|null|nan|none)$/i;
 
+/**
+ * Marks of an id or a code, not a name: path syntax ("topmostSubform[0].f1_01[0]"),
+ * an underscore before a digit ("undefined_2"), letters glued to digits
+ * ("Text1", "f1"), or a hex or uuid-like string ("a1b2c3d4-e5f6-7890").
+ */
+const CODE = [/[[\].]/, /_\d/, /\p{L}\d|\d\p{L}/u, /^(?=.*\d)[\da-f]+(?:-[\da-f]+)+$/i, /^(?=.*\d)[\da-f]{8,}$/i];
+
 /** More words than this read as a sentence, not a name. */
 const MAX_WORDS = 4;
 
@@ -27,12 +34,13 @@ const collapse = (text: string): string => text.replace(/\s+/g, ' ').trim();
 
 /**
  * True when `label` reads as a short name for a field: it has a letter, at
- * most four words, is not a placeholder such as "undefined", and does not end
- * in a word that continues a sentence ("of", "as", "from").
+ * most four words, is not a placeholder such as "undefined" or an id or code
+ * such as "Text1", and does not end in a word that continues a sentence ("of",
+ * "as", "from").
  */
 export function isPlainLabel(label: string): boolean {
   const text = collapse(label);
-  if (!/\p{L}/u.test(text) || PLACEHOLDER.test(text)) return false;
+  if (!/\p{L}/u.test(text) || PLACEHOLDER.test(text) || CODE.some((re) => re.test(text))) return false;
   const words = text.split(' ');
   if (words.length > MAX_WORDS) return false;
   const last = (words[words.length - 1] ?? '').toLowerCase().replace(/[^\p{L}\p{N}]/gu, '');
@@ -56,7 +64,10 @@ const TYPE_WORD: Record<string, string> = {
  */
 export function acroFieldLabel(field: { name: string; type: string; tooltip?: string }, number: number): string {
   for (const text of [field.tooltip, field.name]) {
-    if (text !== undefined && isPlainLabel(text)) return collapse(text).replace(/_(\d+)$/, ' $1').slice(0, 200);
+    if (text === undefined) continue;
+    // A numbered copy such as "Print Name_2" reads as "Print Name 2" when its base name is plain.
+    const [, base = collapse(text), copy] = /^(.*?)_(\d+)$/.exec(collapse(text)) ?? [];
+    if (isPlainLabel(base)) return (copy === undefined ? base : `${base} ${copy}`).slice(0, 200);
   }
   return `${TYPE_WORD[field.type] ?? 'Field'} ${number}`;
 }

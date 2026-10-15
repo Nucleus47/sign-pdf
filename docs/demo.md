@@ -5,11 +5,11 @@ NDA that has no form fields. The steps for the agent are in the "Demo" section o
 [agent skill](../skills/sign-pdf/SKILL.md#demo) and in
 [llms.txt](../packages/web/public/llms.txt). In short:
 
-- The agent asks before it puts the user's name and company on the NDA. Without a yes, it
-  uses demo values ("Example Co.", "Your Name"). Party B is always "Sample Partner Co.".
-- The agent says where the data goes: the MCP server, the CLI and the website upload
+- First, the agent says where the data goes: the MCP server, the CLI and the website upload
   nothing; the agent's model provider receives the chat; only the optional email relay
   stores an encrypted copy, for a limited time ([relay](relay.md#state-and-lifetimes)).
+- Then it asks before it puts the user's name and company on the NDA. Without a yes, it
+  uses demo values ("Example Co.", "Your Name"). Party B is always "Sample Partner Co.".
 - The agent shows the filled preview and asks before it requests a signature.
 
 There are two routes: the MCP server, and the browser only. Both use the same request,

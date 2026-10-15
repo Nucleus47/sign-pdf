@@ -33,16 +33,17 @@ NDA with no form fields. The demo has five fields: Party A and Party B (you fill
 the signature, date and print name of Party A (the human fills them). Do not place fields
 on the other blanks. The skill has the full demo script.
 
-1. Ask the user: "Can I put your name and company on the demo NDA?" On yes, use the user's
+1. Tell the user where the data goes, before you ask for their name or in the same message.
+   The MCP server and the CLI run on this computer and upload nothing; the sign view opens
+   at a local address (127.0.0.1). This website processes the PDF in the browser and
+   uploads nothing. Your agent's model provider receives what you read and write in the
+   chat, such as the name, the company and the preview images. Only the optional email to
+   another signer stores an encrypted copy on the relay, for up to 7 days (the signed copy
+   up to 5 days), and the relay does not keep the key; the demo does not use it.
+2. Ask the user: "Can I put your name and company on the demo NDA?" On yes, use the user's
    company for Party A and the user's name for Print name. On no, use the demo values
    "Example Co." and "Your Name". Party B is always "Sample Partner Co.". Put no other real
    information on the form.
-2. Tell the user where the data goes. The MCP server and the CLI run on this computer and
-   upload nothing; the sign view opens at a local address (127.0.0.1). This website
-   processes the PDF in the browser and uploads nothing. Your agent's model provider
-   receives what you read and write in the chat. Only the optional email to another signer
-   stores an encrypted copy on the relay, for up to 7 days (the signed copy up to 5 days);
-   the demo does not use it.
 3. The ready request is https://sign.silv.app/demo-request.json: the five fields with plain
    labels and the demo values. Change `party_a` and `print_name` only after a yes.
    - MCP route: download `/demo-nda.pdf`, run `inspect_pdf` (no form fields),

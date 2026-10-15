@@ -1,5 +1,5 @@
 import { readFile } from 'node:fs/promises';
-import { PDFArray, PDFDocument, PDFName, PDFNumber, PDFOperator, PDFOperatorNames, StandardFonts, degrees } from '@cantoo/pdf-lib';
+import { PDFArray, PDFDocument, PDFHexString, PDFName, PDFNumber, PDFOperator, PDFOperatorNames, StandardFonts, degrees } from '@cantoo/pdf-lib';
 import { afterEach, describe, expect, it } from 'vitest';
 import {
   SignPdfError,
@@ -91,6 +91,21 @@ describe('inspectPdf', () => {
       { page: 2, width: 600, height: 400 },
       { page: 3, width: 400, height: 600 },
     ]);
+  });
+
+  it('reads a form field tooltip (TU), trimmed, and leaves it out when there is none', async () => {
+    const doc = await PDFDocument.create();
+    const page = doc.addPage([612, 792]);
+    const form = doc.getForm();
+    const named = form.createTextField('topmostSubform[0].f1_01[0]');
+    named.addToPage(page, { x: 72, y: 600, width: 200, height: 20 });
+    named.acroField.dict.set(PDFName.of('TU'), PDFHexString.fromText('  Your   first name '));
+    form.createTextField('plain').addToPage(page, { x: 72, y: 500, width: 200, height: 20 });
+    const { acroFields } = await inspectPdf(await doc.save());
+    expect(acroFields.find((field) => field.name === 'topmostSubform[0].f1_01[0]')?.tooltip).toBe('Your first name');
+    const plain = acroFields.find((field) => field.name === 'plain');
+    expect(plain).toBeDefined();
+    expect(plain).not.toHaveProperty('tooltip');
   });
 
   it('positions text runs from the top-left of the displayed page', async () => {
