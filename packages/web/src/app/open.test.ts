@@ -1,14 +1,30 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { Packet } from '@sign-pdf/spec';
 import { setCore } from '../lib/core.ts';
 import { fakeCore, SHA, TWO_SIGNERS } from '../testing/fixtures.ts';
-import { openPdfBytes } from './open.ts';
+import { openPdfBytes, openSample, SAMPLE_REQUEST } from './open.ts';
 
 const PDF = new Uint8Array([0x25, 0x50, 0x44, 0x46, 0x2d, 1]);
 const ORIGINAL = new Uint8Array([0x25, 0x50, 0x44, 0x46, 0x2d, 2]);
 let restore: () => void = () => undefined;
 
-afterEach(() => restore());
+afterEach(() => {
+  restore();
+  vi.unstubAllGlobals();
+});
+
+describe('opening the sample', () => {
+  it('reports an error, not a half-opened demo, when the demo request is missing', async () => {
+    let opened = false;
+    restore = setCore(fakeCore({ readHandoffPdf: () => { opened = true; return Promise.resolve(null); } }));
+    vi.stubGlobal('fetch', (url: string) =>
+      Promise.resolve(url.endsWith(SAMPLE_REQUEST) ? new Response('Not found', { status: 404 }) : new Response(PDF)),
+    );
+    const result = await openSample();
+    expect(result).toMatchObject({ kind: 'error', message: 'The sample document could not be loaded.', failure: { code: 'sample-http-404' } });
+    expect(opened).toBe(false);
+  });
+});
 
 describe('opening a PDF', () => {
   it('resumes a hand-off PDF at the next turn, on the original PDF it carries', async () => {

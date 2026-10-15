@@ -78,7 +78,11 @@ export interface SignJob {
 }
 
 export type Opened =
-  | { kind: 'prepare'; document: LoadedDocument }
+  /**
+   * `request` goes on the page as the view opens (the sample's demo fields);
+   * `demo` marks the sample, so the view says what it is.
+   */
+  | { kind: 'prepare'; document: LoadedDocument; request?: unknown; demo?: boolean }
   | { kind: 'sign'; job: SignJob }
   /** `message` is for the page; `failure` and `file` are for the error report. */
   | { kind: 'error'; message: string; failure: Failure; file?: FileFacts };
@@ -234,14 +238,21 @@ export async function openFiles(files: readonly File[]): Promise<Opened> {
   return fail(`“${first.name}” is not a PDF. Choose a file that ends in .pdf.`, 'not-a-pdf', factsOf(first));
 }
 
-export const SAMPLE_NAME = 'sample-nda.pdf';
+/** The sample is the agent demo (docs/demo.md): the NDA with no form fields, and its five demo fields. */
+export const SAMPLE_NAME = 'demo-nda.pdf';
+export const SAMPLE_REQUEST = 'demo-request.json';
 
-/** The bundled sample: one of the site's own static files. */
+/** The bundled sample: two of the site's own static files, opened in prepare with the demo fields on the page. */
 export async function openSample(): Promise<Opened> {
   try {
-    const response = await fetch(`${import.meta.env.BASE_URL}${SAMPLE_NAME}`);
-    if (!response.ok) return fail('The sample document could not be loaded.', `sample-http-${response.status}`);
-    return openPdfBytes(SAMPLE_NAME, new Uint8Array(await response.arrayBuffer()));
+    const [pdf, request] = await Promise.all(
+      [SAMPLE_NAME, SAMPLE_REQUEST].map((name) => fetch(`${import.meta.env.BASE_URL}${name}`)),
+    );
+    for (const response of [pdf, request]) {
+      if (!response?.ok) return fail('The sample document could not be loaded.', `sample-http-${response?.status ?? 0}`);
+    }
+    const opened = await openPdfBytes(SAMPLE_NAME, new Uint8Array(await pdf!.arrayBuffer()));
+    return opened.kind === 'prepare' ? { ...opened, request: (await request!.json()) as unknown, demo: true } : opened;
   } catch (error) {
     return failWith(error);
   }

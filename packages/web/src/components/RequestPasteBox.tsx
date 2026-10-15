@@ -65,8 +65,10 @@ export function RequestPasteBox({ result, onApply, open = false, onDismiss }: Re
 
   const resultRef = useRef<HTMLDivElement>(null);
   // A result from a #request= link appears without a click: bring it into view.
+  // Not while the box is closed (the sample's demo fields): the result is hidden then.
   useEffect(() => {
-    resultRef.current?.scrollIntoView?.({ block: 'nearest' });
+    const shownResult = resultRef.current;
+    if (shownResult?.closest('details')?.open) shownResult.scrollIntoView?.({ block: 'nearest' });
   }, [result, parseError]);
 
   const shown = parseError ? { ok: false, text: parseError, issues: [] } : result ? describeApplyResult(result) : null;

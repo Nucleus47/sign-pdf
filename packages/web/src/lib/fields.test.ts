@@ -111,8 +111,20 @@ describe('prepare reducer', () => {
 
   it('does not copy a placeholder form field name such as "undefined" into the label', () => {
     const [field] = fieldsFromAcroFields([{ name: 'undefined', type: 'text', rect, readOnly: false }], []);
-    expect(field?.label).toBe('');
+    expect(field?.label).toBe('Text 1');
     expect(field?.acroField).toBe('undefined');
+  });
+
+  it('labels a form field named with a fragment of the page text by its tooltip, or by its type and number', () => {
+    const fields = fieldsFromAcroFields(
+      [
+        { name: 'day of', type: 'text', rect, readOnly: false },
+        { name: 'hereinafter known as', type: 'text', rect, readOnly: false, tooltip: 'Party A' },
+        { name: 'Print Name_2', type: 'text', rect, readOnly: false },
+      ],
+      [],
+    );
+    expect(fields.map((field) => field.label)).toEqual(['Text 1', 'Party A', 'Print Name 2']);
   });
 
   it('does not move a field that follows an existing form field until it is unlinked', () => {

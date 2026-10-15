@@ -1,3 +1,4 @@
+import { readFile } from 'node:fs/promises';
 import type { FieldInput } from '@sign-pdf/spec';
 import { describe, expect, it } from 'vitest';
 import { anchorCandidatesOf, inspectPdf, nearestTextMatches, sha256Hex, validateRequestAgainstPdf } from './index.ts';
@@ -154,6 +155,26 @@ describe('validateRequestAgainstPdf', () => {
 
   it('throws only for an unreadable PDF', async () => {
     await expect(validateRequestAgainstPdf(new Uint8Array([1, 2, 3]), {})).rejects.toMatchObject({ code: 'invalid-pdf' });
+  });
+});
+
+describe('label-is-page-text', () => {
+  it('warns when a label repeats the printed fragment next to its field, and not for a plain label', async () => {
+    const pdf = new Uint8Array(await readFile(new URL('../../web/public/sample-nda.pdf', import.meta.url)));
+    const field = (label: string): FieldInput => ({
+      id: 'party_a',
+      type: 'text',
+      label,
+      assignee: 'human',
+      placement: { kind: 'acroField', name: 'hereinafter known as' },
+    });
+    const echoed = await validateRequestAgainstPdf(pdf, await requestFor(pdf, [field('hereinafter known as')]));
+    expect(echoed.report.ok).toBe(true);
+    expect(echoed.report.warnings.filter((issue) => issue.code === 'label-is-page-text')).toEqual([
+      expect.objectContaining({ fieldId: 'party_a' }),
+    ]);
+    const plain = await validateRequestAgainstPdf(pdf, await requestFor(pdf, [field('Party A')]));
+    expect(plain.report.warnings.filter((issue) => issue.code === 'label-is-page-text')).toEqual([]);
   });
 });
 

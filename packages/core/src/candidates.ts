@@ -13,6 +13,7 @@ import {
   type Line,
 } from './resolve.ts';
 
+import { acroFieldLabel } from './labels.ts';
 import { MAX_PLACEMENT_CANDIDATES } from './limits.ts';
 
 export { MAX_PLACEMENT_CANDIDATES };
@@ -41,6 +42,11 @@ export interface PlacementCandidate extends AnchorCandidate {
     placement: PlacementInput;
     /** The field type the label or form field suggests, when it is obvious. */
     type?: FieldType;
+    /**
+     * For a form field: a plain label for the signer, from its tooltip or name,
+     * or "Text 3" when neither is a plain name. Untrusted document content.
+     */
+    label?: string;
   };
 }
 
@@ -127,6 +133,8 @@ interface Found {
   footprint: Rect;
   /** Set for widgets. */
   acroName?: string;
+  /** Set for widgets: a plain label (labels.ts). */
+  plainLabel?: string;
   /** More specific explanation for a structural rule such as a table header. */
   reason?: string;
 }
@@ -663,7 +671,7 @@ export function findPlacementCandidates(
   const requested = options.max ?? MAX_PLACEMENT_CANDIDATES;
   const max = Number.isFinite(requested) ? Math.max(0, Math.floor(requested)) : MAX_PLACEMENT_CANDIDATES;
   const widgets: Found[] = [];
-  for (const field of input.acroFields) {
+  for (const [index, field] of input.acroFields.entries()) {
     if (!field.rect || field.readOnly || field.type === 'button') continue;
     const type = widgetType(field);
     widgets.push({
@@ -673,6 +681,7 @@ export function findPlacementCandidates(
       target: field.rect,
       footprint: field.rect,
       acroName: field.name,
+      plainLabel: acroFieldLabel(field, index + 1),
       ...(type ? { type } : {}),
     });
   }
@@ -738,7 +747,11 @@ export function findPlacementCandidates(
               ? `Label '${found.label.text}' marks a printed blank line`
               : 'Printed underscore run'
             : `Label '${found.text}' with empty space to its right`),
-      suggested: found.type ? { placement, type: found.type } : { placement },
+      suggested: {
+        placement,
+        ...(found.type ? { type: found.type } : {}),
+        ...(found.plainLabel !== undefined ? { label: found.plainLabel } : {}),
+      },
     };
   });
   return { candidates: groupSignatureBlocks(candidates), truncated: all.length > kept.length, total: all.length };

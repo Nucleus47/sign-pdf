@@ -7,6 +7,7 @@
 import { SignPdfError } from './errors.ts';
 import type { PdfInspection, TextItem } from './index.ts';
 import { inspectPdf } from './inspect.ts';
+import { isPlainLabel, labelEchoesPageText } from './labels.ts';
 import { resolveRequestCollect, type AnchorCandidate, type ResolveReport, type ResolveWarning } from './resolve.ts';
 import {
   isSigningField,
@@ -215,6 +216,35 @@ function findWarnings(request: SignRequest, fields: readonly ResolvedField[]): V
   return warnings;
 }
 
+/** Printed lines next to a rect: on its page, within its height above or below, and at most this far to either side. */
+const NEARBY_GAP = 150;
+
+function linesNear(lines: readonly TextLine[], rect: Rect): string[] {
+  return lines
+    .filter((line) => {
+      if (line.page !== rect.page) return false;
+      const vertical = line.y < rect.y + 2 * rect.height && line.y + line.height > rect.y - rect.height;
+      const gap = Math.max(line.x, rect.x) - Math.min(line.x + line.width, rect.x + rect.width);
+      return vertical && gap <= NEARBY_GAP;
+    })
+    .map((line) => line.text);
+}
+
+/** A label that is not a plain name and repeats the printed text next to its field. */
+async function labelWarnings(fields: readonly ResolvedField[], pdfText: () => Promise<TextItem[]>): Promise<ValidationIssue[]> {
+  const suspect = fields.filter((field) => field.label !== undefined && !isPlainLabel(field.label));
+  if (suspect.length === 0) return [];
+  const lines = buildLines(await pdfText());
+  return suspect
+    .filter((field) => labelEchoesPageText(field.label ?? '', linesNear(lines, field.rect)))
+    .map((field) => ({
+      code: 'label-is-page-text',
+      fieldId: field.id,
+      message: `Field "${field.id}" has a label that repeats the text printed next to it. The signer can read it as a value.`,
+      hint: 'Give the field a short label in plain words that names it, such as "Party B" or "Date".',
+    }));
+}
+
 function ambiguityIssue(warning: ResolveWarning): ValidationIssue {
   return {
     code: warning.code,
@@ -366,7 +396,11 @@ export async function validateRequestAgainstPdf(pdf: Uint8Array, requestInput: u
   const { resolved, fields } = outcome;
 
   report.fields = fields.map(toFieldReport);
-  report.warnings = [...outcome.warnings.map(ambiguityIssue), ...findWarnings(request, fields)];
+  report.warnings = [
+    ...outcome.warnings.map(ambiguityIssue),
+    ...findWarnings(request, fields),
+    ...(await labelWarnings(fields, pdfText)),
+  ];
   report.ok = report.errors.length === 0 && resolved !== undefined;
   return report.ok && resolved ? { report, resolved } : { report };
 }

@@ -1,5 +1,5 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
-import { expectOnlyOwnStaticAssets, SIGNER, watch } from './helpers.ts';
+import { chooseSamplePdfByKeyboard, expectOnlyOwnStaticAssets, SIGNER, watch } from './helpers.ts';
 
 /** Tab forward until the wanted control has focus. No pointer is used in this file. */
 async function tabTo(page: Page, target: Locator, limit = 200): Promise<void> {
@@ -19,8 +19,8 @@ async function typeInto(page: Page, target: Locator, text: string): Promise<void
 test('the whole flow works with the keyboard alone', async ({ page, baseURL }) => {
   const seen = watch(page);
   await page.goto('/');
-  await tabTo(page, page.getByTestId('load-sample'));
-  await page.keyboard.press('Enter');
+  await tabTo(page, page.getByTestId('open-pdf-input'));
+  await chooseSamplePdfByKeyboard(page);
   await expect(page.getByTestId('app-root')).toHaveAttribute('data-state', 'preparing');
   await expect(page.getByTestId('pdf-page-3')).toBeVisible();
 

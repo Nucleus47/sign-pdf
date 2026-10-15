@@ -4,12 +4,14 @@ import {
   PDFButton,
   PDFCheckBox,
   PDFDropdown,
+  PDFHexString,
   PDFName,
   PDFOptionList,
   PDFRadioGroup,
   PDFRef,
   PDFRawStream,
   PDFSignature,
+  PDFString,
   PDFTextField,
   type PDFDocument,
   type PDFField,
@@ -201,6 +203,17 @@ export function widgetPageIndex(doc: PDFDocument, widget: PDFWidgetAnnotation): 
   });
 }
 
+/** The field's tooltip (TU), trimmed and at most 200 characters; empty when it has none. */
+function fieldTooltip(field: PDFField): string {
+  const tu = field.acroField.dict.lookup(PDFName.of('TU'));
+  if (!(tu instanceof PDFString) && !(tu instanceof PDFHexString)) return '';
+  try {
+    return tu.decodeText().replace(/\s+/g, ' ').trim().slice(0, 200);
+  } catch {
+    return '';
+  }
+}
+
 /** Displayed rect of a field's first widget that sits on a page. */
 export function firstWidgetRect(
   doc: PDFDocument,
@@ -231,6 +244,8 @@ export function listAcroFields(doc: PDFDocument, pages: readonly PageGeometry[])
       if (rect) info.rect = rect;
       const value = fieldValue(field);
       if (value !== undefined) info.value = value;
+      const tooltip = fieldTooltip(field);
+      if (tooltip) info.tooltip = tooltip;
       return info;
     });
 }

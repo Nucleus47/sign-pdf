@@ -55,11 +55,13 @@ export interface PrepareProps {
   initialRequest?: unknown;
   /** Called once the initial request is on the page, or the person dismissed it. */
   onInitialRequestUsed?: () => void;
+  /** The sample is open: say that it is a demo with demo values, and where the data goes. */
+  demo?: boolean;
 }
 
 type AnchorAlign = 'right' | 'below' | 'above' | 'over';
 
-export function Prepare({ document: doc, state, dispatch, onContinue, initialRequest, onInitialRequestUsed }: PrepareProps) {
+export function Prepare({ document: doc, state, dispatch, onContinue, initialRequest, onInitialRequestUsed, demo = false }: PrepareProps) {
   const [pages, setPages] = useState<PageInfo[]>(doc.inspection.pages);
   const [placing, setPlacing] = useState<FieldType | null>(null);
   const [exportError, setExportError] = useState<CoreProblem | null>(null);
@@ -93,7 +95,7 @@ export function Prepare({ document: doc, state, dispatch, onContinue, initialReq
   };
   const initialTried = useRef(false);
   /** A link's request opens the paste box, so its result is in view. */
-  const [pasteOpen] = useState(initialRequest !== undefined);
+  const [pasteOpen] = useState(initialRequest !== undefined && !demo);
   useEffect(() => {
     if (initialRequest === undefined || initialTried.current) return;
     initialTried.current = true;
@@ -440,6 +442,15 @@ export function Prepare({ document: doc, state, dispatch, onContinue, initialReq
           <p className={`doc-name ${UNTRUSTED_TEXT_CLASS}`} data-testid="document-name">
             {displayText(doc.name)}
           </p>
+          {demo && (
+            <div className="notice demo-notice" data-testid="demo-notice">
+              <p>
+                <strong>Demo.</strong> This sample NDA has five fields with demo values. Party A and Party B
+                are filled in. You sign, date and print your name.
+              </p>
+              <p>The PDF and what you type stay in this browser. Nothing is uploaded.</p>
+            </div>
+          )}
           <p className="hint">
             Pick a field type above the page and click where it goes, or add it with the form below.
             Drag a field to move it; with the keyboard, focus it and use the arrow keys. With the page

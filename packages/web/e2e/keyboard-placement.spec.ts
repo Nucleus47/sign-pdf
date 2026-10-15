@@ -1,4 +1,5 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
+import { chooseSamplePdfByKeyboard } from './helpers.ts';
 
 /** Tab forward until the wanted control has focus. No pointer is used in this file. */
 async function tabTo(page: Page, target: Locator, limit = 200): Promise<void> {
@@ -19,8 +20,8 @@ async function position(target: Locator): Promise<{ x: number; y: number; page: 
 
 async function openSampleByKeyboard(page: Page): Promise<Locator> {
   await page.goto('/');
-  await tabTo(page, page.getByTestId('load-sample'));
-  await page.keyboard.press('Enter');
+  await tabTo(page, page.getByTestId('open-pdf-input'));
+  await chooseSamplePdfByKeyboard(page);
   await expect(page.getByTestId('app-root')).toHaveAttribute('data-state', 'preparing');
   await expect(page.getByTestId('pdf-page-3')).toBeVisible();
   const region = page.getByRole('group', { name: 'Pages' });

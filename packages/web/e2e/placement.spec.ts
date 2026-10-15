@@ -157,7 +157,8 @@ test('use the existing form fields of a PDF', async ({ page, baseURL }) => {
   expect(name).toEqual({ page: 1, x: 72, y: 140, width: 220, height: 22 });
   const agree = await fieldRect(page, 'checkbox1');
   expect(agree).toEqual({ page: 1, x: 72, y: 196, width: 16, height: 16 });
-  await expect(page.getByTestId('field-label-text1')).toHaveValue('member.name');
+  // "member.name" is a field path, not a plain name, so the label is the type and number.
+  await expect(page.getByTestId('field-label-text1')).toHaveValue('Text 1');
 
   // A linked field follows the form field: a drag does not move it.
   const box = page.getByTestId('field-box-text1');

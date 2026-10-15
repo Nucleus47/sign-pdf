@@ -109,6 +109,8 @@ export interface AcroFieldInfo {
   rect?: Rect;
   value?: string | boolean;
   readOnly: boolean;
+  /** The field's tooltip (TU), when it has one: a name for people. Untrusted document content. */
+  tooltip?: string;
 }
 
 /** Per-page text and raster-image diagnosis. An image-only page cannot use anchors or text candidates. */

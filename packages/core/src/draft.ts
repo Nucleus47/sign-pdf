@@ -2,6 +2,7 @@ import { safeParseSignRequest, type FieldInput, type Signer, type SignRequestInp
 import type { PlacementCandidate } from './candidates.ts';
 import { SignPdfError } from './errors.ts';
 import type { PdfInspection } from './index.ts';
+import { isPlainLabel } from './labels.ts';
 
 export interface BuildDraftRequestOptions {
   /** 1-based candidate numbers. Defaults to every candidate, in reading order. */
@@ -83,6 +84,17 @@ function chooseFields(candidates: readonly PlacementCandidate[], requested?: rea
   });
 }
 
+/**
+ * A plain label for the signer: the form field's label, or the candidate's
+ * text when it is a plain name, or the type and the candidate number
+ * ("Text 4") when the text is a fragment of the page such as "day of".
+ */
+function draftLabel(candidate: PlacementCandidate, type: string, number: number): string {
+  if (candidate.suggested.label !== undefined) return candidate.suggested.label;
+  if (isPlainLabel(candidate.text)) return candidate.text.slice(0, 200);
+  return `${type.charAt(0).toUpperCase()}${type.slice(1)} ${number}`;
+}
+
 function valuesByCandidate(
   fields: readonly DraftField[],
   values: Readonly<Record<string, string | boolean>> | undefined,
@@ -154,7 +166,7 @@ export function buildDraftRequest(
         : undefined;
       return {
         id,
-        label: candidate.text.slice(0, 200),
+        label: draftLabel(candidate, type, number),
         type,
         assignee,
         placement: { ...candidate.suggested.placement },

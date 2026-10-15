@@ -8,7 +8,8 @@
   "exports": {
     ".": "./src/index.ts",
     "./sign": "./src/sign.ts",
-    "./tools": "./src/tools.ts"
+    "./tools": "./src/tools.ts",
+    "./labels": "./src/labels.ts"
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",
