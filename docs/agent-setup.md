@@ -67,6 +67,9 @@ web app later, when you are not at the computer now.
 
 The full inputs and outputs are in the [MCP server README](../packages/mcp/README.md#tools).
 
+To show a user the flow, follow the [agent demo](demo.md): the agent places and fills
+fields on an NDA with no form fields and stops before signing.
+
 ## Install from a checkout
 
 To work on sign-pdf itself, run from a checkout. At the repository root, run:

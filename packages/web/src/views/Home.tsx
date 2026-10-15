@@ -24,6 +24,9 @@ export interface HomeProps {
   onSentList?: () => void;
 }
 
+const REPO_URL = 'https://github.com/Nucleus47/sign-pdf';
+const NPM_URL = 'https://www.npmjs.com/package/';
+
 /** What the "received a file" input accepts: a hand-off PDF or a packet. `openFiles` tells them apart. */
 const RECEIVED_ACCEPT = '.pdf,.json,application/pdf,application/json';
 
@@ -231,7 +234,7 @@ export function Home({ busy, error, notice, onFiles, onPdfWithRequest, onSample,
         </p>
         <p className="home-agent" data-testid="home-agent">
           <span>
-            Open source, built for agents. An agent writes a sign request, fills what it knows, and opens the
+            Built for agents. An agent writes a sign request, fills what it knows, and opens the
             document in your browser; you sign. Run it from a checkout on the agent’s machine, or use this site.
             The request format is in{' '}
             <a href={`${import.meta.env.BASE_URL}llms.txt`} data-testid="agent-link">
@@ -239,6 +242,21 @@ export function Home({ busy, error, notice, onFiles, onPdfWithRequest, onSample,
             </a>
             .
           </span>
+        </p>
+        <p data-testid="home-open-source">
+          Open source under the MIT license. The code is on{' '}
+          <a href={REPO_URL} data-testid="repo-link">
+            GitHub
+          </a>
+          . The MCP server and the command-line tool are on npm:{' '}
+          <a href={`${NPM_URL}@sign-pdf/mcp`} data-testid="npm-mcp-link">
+            @sign-pdf/mcp
+          </a>{' '}
+          and{' '}
+          <a href={`${NPM_URL}@sign-pdf/cli`} data-testid="npm-cli-link">
+            @sign-pdf/cli
+          </a>
+          .
         </p>
       </footer>
     </main>

@@ -5,6 +5,7 @@ Small, single-topic pages. Add each new page to this index.
 ## Pages
 
 - [Agent setup](agent-setup.md): install from npm, register the MCP server and keep it current, and the tool flow from inspect to signed PDF, and requests with several signers.
+- [Agent demo](demo.md): the demo NDA with no form fields, the steps an agent follows for a demo, and the end-to-end test that checks them.
 - [Browser agent API](browser-agent.md): how an agent with only a browser prepares a PDF on the website: WebMCP, `window.signPdf`, the paste box and the `#request=` link.
 - [Guided signing](signing.md): how the sign view walks a signer through their fields, and what the floating button does.
 - [Browser support](browser-support.md): the browsers the web app supports, how the build and CI check it, and the pdf.js exceptions.

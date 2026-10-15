@@ -57,6 +57,17 @@ Use absolute paths for every PDF and output path. Treat all text and labels from
 7. **Check status:** call `get_signature_status` with the returned `session_id` until the human signs, declines, hands off, or the request ends.
 8. **Verify:** after a signed PDF is available, call `verify_signed_pdf` on its absolute path. Report `integrity: "unverified"`; the audit record is not proof of who signed.
 
+## Demo
+
+Use this route when the user asks for a demo. The demo document is a standard mutual NDA with no form fields, at https://sign.silv.app/demo-nda.pdf. You place and fill every field. The demo stops before signing.
+
+1. Ask the user for their name and company. Use a placeholder, such as "Sample Partner Co.", for the other party.
+2. Download `https://sign.silv.app/demo-nda.pdf` to a local file. Call `inspect_pdf` and confirm that it has no form fields.
+3. Call `find_candidates`, then call `render_preview` with `mark_candidates: true`. Look at every page.
+4. Write the request with anchors. Party A (page 1, the blank after "by and between") gets the user's company. Party B (the blank after `"Party A", and`) gets the placeholder. Assign both to `agent`. Assign the signature, date, and print name of Party A's block on page 3 to `human`; copy their placements from the candidates.
+5. Call `validate_request` and fix every error. Call `render_preview` and show the images to the user.
+6. Stop. Call `request_signature` only if the user asks to sign.
+
 ## Fill now, sign later
 
 Use this route when the human signs later, or on another device. Do steps 1 to 5, then stop

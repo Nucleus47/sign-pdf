@@ -1,11 +1,12 @@
 import { execFileSync } from 'node:child_process';
-import { cpSync, createReadStream, existsSync, readFileSync, statSync } from 'node:fs';
+import { cpSync, createReadStream, existsSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { dirname, join, normalize, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import react from '@vitejs/plugin-react';
 import { defineConfig, type Plugin } from 'vite';
 import { esbuildTargets } from './browserTargets.ts';
+import { flattenForDemo } from './demoNda.ts';
 import { derivedPort } from './ports.ts';
 
 /**
@@ -95,6 +96,34 @@ function agentSkill(): Plugin {
 }
 
 /**
+ * The demo document for agents, served at /demo-nda.pdf: the sample NDA with
+ * its form fields removed (demoNda.ts). It is made at build time, so no second
+ * PDF is kept in the repository.
+ */
+function demoNda(): Plugin {
+  const source = fileURLToPath(new URL('./public/sample-nda.pdf', import.meta.url));
+  let outDir = 'dist';
+  return {
+    name: 'sign-pdf:demo-nda',
+    configResolved(config) {
+      outDir = join(config.root, config.build.outDir);
+    },
+    configureServer(server) {
+      server.middlewares.use('/demo-nda.pdf', (_request, response, next) => {
+        flattenForDemo(readFileSync(source)).then((pdf) => {
+          response.setHeader('Content-Type', 'application/pdf');
+          response.end(pdf);
+        }, next);
+      });
+    },
+    async closeBundle() {
+      if (this.meta.watchMode) return;
+      writeFileSync(join(outDir, 'demo-nda.pdf'), await flattenForDemo(readFileSync(source)));
+    },
+  };
+}
+
+/**
  * The commit the app was built from, for error reports. APP_COMMIT names it
  * (deploy.yml passes the commit CI tested and checked out); else HEAD; else "unknown".
  * GITHUB_SHA is not used: in a workflow_run deploy it is not the commit that is built.
@@ -110,7 +139,7 @@ export function appCommit(): string {
 }
 
 export default defineConfig({
-  plugins: [react(), pdfjsAssets(), agentSkill()],
+  plugins: [react(), pdfjsAssets(), agentSkill(), demoNda()],
   define: { __APP_COMMIT__: JSON.stringify(appCommit()) },
   server: { port: derivedPort(), strictPort: true },
   preview: { port: derivedPort(1), strictPort: true, headers: headersForAllPaths() },
