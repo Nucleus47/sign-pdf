@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "document": {
+    "name": "sample-nda.pdf",
+    "sha256": "bd1b1524053541be462b2f4ba7b904427208c1be6f170e1d10257b1e27542bd3"
+  },
+  "title": "Mutual non-disclosure agreement",
+  "note": "Party names are filled in. Please check them, then sign as Party A.",
+  "signer": { "name": "Ada Example" },
+  "fields": [
+    {
+      "id": "party_a",
+      "type": "text",
+      "label": "Party A",
+      "assignee": "agent",
+      "value": "Example Co",
+      "placement": { "kind": "acroField", "name": "hereinafter known as" }
+    },
+    {
+      "id": "party_b",
+      "type": "text",
+      "label": "Party B",
+      "assignee": "agent",
+      "value": "Sample LLC",
+      "placement": { "kind": "acroField", "name": "hereinafter known as Party B" }
+    },
+    {
+      "id": "party_a_signature",
+      "type": "signature",
+      "label": "Party A signature",
+      "assignee": "human",
+      "placement": {
+        "kind": "anchor",
+        "text": "Party A’s Signature",
+        "page": 3,
+        "align": "right",
+        "dx": 4,
+        "dy": -8,
+        "width": 170,
+        "height": 30
+      }
+    },
+    {
+      "id": "party_a_date",
+      "type": "date",
+      "label": "Date",
+      "assignee": "human",
+      "placement": { "kind": "acroField", "name": "Date" }
+    },
+    {
+      "id": "party_a_name",
+      "type": "text",
+      "label": "Print name",
+      "assignee": "human",
+      "placement": { "kind": "acroField", "name": "Print Name" }
+    }
+  ]
+}

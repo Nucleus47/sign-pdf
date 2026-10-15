@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>sign-pdf: prepare a PDF, then review and sign it in your browser</title>
+    <meta
+      name="description"
+      content="Private, on-device PDF signing. An agent or a person places and fills fields on a PDF; a human reviews every value and signs. Nothing is uploaded."
+    />
+    <meta name="theme-color" content="#1d3fae" />
+    <!-- Chrome origin trial for WebMCP (docs/browser-agent.md). Valid only on https://sign.silv.app; it expires 2027-03-30. -->
+    <meta http-equiv="origin-trial" content="AlseyXYWk6pm5loYDWBNQACBwVvpj8WKgwIGtlMapTlMUA5w0KlPSXHiuOOCo77EJvzSjB5+NmgAtZxccYCwiQoAAABNeyJvcmlnaW4iOiJodHRwczovL3NpZ24uc2lsdi5hcHA6NDQzIiwiZmVhdHVyZSI6IldlYk1DUCIsImV4cGlyeSI6MTgwNjM2NDgwMH0=" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>sign-pdf needs JavaScript: it reads and signs the PDF in your browser.</noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

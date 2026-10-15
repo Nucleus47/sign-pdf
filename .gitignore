@@ -1,0 +1,60 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Testing artifacts
+.playwright-data/
+.playwright-mcp/
+playwright-report/
+test-results/
+
+# TypeScript build info
+*.tsbuildinfo
+
+# Private/local configuration
+CLAUDE.md
+.claude/
+
+# Planning and temporary files
+planning/
+*.tmp
+*.temp
+DRAG_PERFORMANCE_ISSUE.md
+ENGINEER_PRIMER_SIGNATURE_UI.md
+SIGNATURE_UI_ENHANCEMENTS_ISSUE.md
+TEST_INFRASTRUCTURE_IMPROVEMENTS.md
+
+# Personal data
+*.pdf
+!/packages/web/public/sample-nda.pdf
+coordinate_test.pdf
+
+# Wrangler/Cloudflare
+.wrangler/
+
+# Environment variables
+.env
+.env.local
+.env.production
+.env.*.local

@@ -1,0 +1,32 @@
+{
+  "name": "sign-pdf",
+  "private": true,
+  "version": "2.0.0-alpha.0",
+  "type": "module",
+  "license": "MIT",
+  "packageManager": "pnpm@10.32.1",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "typecheck": "pnpm -r typecheck && tsc -p e2e/tsconfig.json",
+    "test": "pnpm -r test",
+    "build": "pnpm -r --if-present build",
+    "check": "pnpm typecheck && pnpm lint && pnpm test && pnpm build",
+    "release:pack": "node scripts/release/pack.mjs",
+    "release:smoke": "node scripts/release/smoke-packed.mjs",
+    "test:integration": "pnpm --filter @sign-pdf/web build && pnpm --filter @sign-pdf/cli build && playwright test -c e2e/playwright.config.ts",
+    "lint": "pnpm -r --if-present lint"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.1",
+    "@playwright/test": "^1.63.0",
+    "@sign-pdf/cli": "workspace:*",
+    "@sign-pdf/core": "workspace:*",
+    "@sign-pdf/mcp": "workspace:*",
+    "@sign-pdf/spec": "workspace:*",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.9.0",
+    "vitest": "^3.2.0"
+  }
+}

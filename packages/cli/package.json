@@ -1,0 +1,35 @@
+{
+  "name": "@sign-pdf/cli",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "description": "Command-line tool for agents: inspect a PDF, validate and preview a sign request, and hand the document to a human to sign in their browser.",
+  "bin": {
+    "sign-pdf": "./dist/bin.js"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./test-helpers": "./src/test-helpers.ts"
+  },
+  "files": [
+    "dist",
+    "examples",
+    "README.md"
+  ],
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "build": "tsup && node scripts/check-bundle.mjs dist/bin.js && node dist/bin.js --version"
+  },
+  "dependencies": {
+    "@napi-rs/canvas": "^1.0.10",
+    "pdfjs-dist": "^6.4.299"
+  },
+  "devDependencies": {
+    "@cantoo/pdf-lib": "^2.11.1",
+    "@sign-pdf/core": "workspace:*",
+    "@sign-pdf/spec": "workspace:*",
+    "tsup": "^8.5.1"
+  }
+}

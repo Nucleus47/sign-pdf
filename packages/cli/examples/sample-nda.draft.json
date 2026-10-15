@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "document": {
+    "name": "sample-nda.pdf",
+    "sha256": "bd1b1524053541be462b2f4ba7b904427208c1be6f170e1d10257b1e27542bd3"
+  },
+  "fields": [
+    {
+      "id": "hereinafter_known_as",
+      "label": "hereinafter known as",
+      "type": "text",
+      "assignee": "human",
+      "placement": {
+        "kind": "acroField",
+        "name": "hereinafter known as"
+      }
+    },
+    {
+      "id": "hereinafter_known_as_party_b",
+      "label": "hereinafter known as Party B",
+      "type": "text",
+      "assignee": "human",
+      "placement": {
+        "kind": "acroField",
+        "name": "hereinafter known as Party B"
+      }
+    },
+    {
+      "id": "party_a_s_signature",
+      "label": "Party A’s Signature",
+      "type": "signature",
+      "assignee": "human",
+      "placement": {
+        "kind": "anchor",
+        "text": "Party A’s Signature",
+        "page": 3,
+        "align": "right",
+        "dx": 3.38,
+        "dy": -4,
+        "width": 173.9,
+        "height": 20
+      }
+    },
+    {
+      "id": "date",
+      "label": "Date",
+      "type": "date",
+      "assignee": "human",
+      "placement": {
+        "kind": "acroField",
+        "name": "Date"
+      }
+    },
+    {
+      "id": "print_name",
+      "label": "Print Name",
+      "type": "text",
+      "assignee": "human",
+      "placement": {
+        "kind": "acroField",
+        "name": "Print Name"
+      }
+    }
+  ]
+}

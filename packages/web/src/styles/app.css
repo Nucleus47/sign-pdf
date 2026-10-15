@@ -1,0 +1,2655 @@
+/* Layout changes come from media queries only; the DOM is the same on every device. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-desk);
+  color: var(--color-ink);
+  font-family: var(--font-ui);
+  font-size: var(--text-m);
+  line-height: var(--leading);
+}
+
+h1,
+h2,
+h3,
+p,
+ol,
+ul,
+dl,
+dd,
+fieldset,
+legend {
+  margin: 0;
+  padding: 0;
+}
+
+fieldset {
+  border: 0;
+  min-width: 0;
+}
+
+h1 {
+  font-family: var(--font-doc);
+  font-size: var(--text-xl);
+  font-weight: 600;
+  line-height: var(--leading-tight);
+}
+
+h2 {
+  font-size: var(--text-m);
+  font-weight: 700;
+  line-height: var(--leading-tight);
+}
+
+h3 {
+  font-size: var(--text-s);
+  font-weight: 700;
+}
+
+h1:focus {
+  outline: none;
+}
+
+a {
+  color: var(--color-pen);
+}
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+}
+
+:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.skip-link {
+  position: absolute;
+  left: var(--space-2);
+  top: -4rem;
+  z-index: 50;
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface);
+  border-radius: var(--radius-s);
+}
+
+.skip-link:focus {
+  top: var(--space-2);
+}
+
+/* ---------------------------------------------------------------- app bar */
+
+.app {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-bar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: var(--bar-height);
+  padding: 0 var(--space-4);
+  background: var(--color-ink);
+  color: var(--color-surface);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--target);
+  padding: 0 var(--space-1);
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+/* A sheet with a signature line and a flag: the product in sixteen pixels. */
+.brand-mark {
+  position: relative;
+  width: 1rem;
+  height: 1.25rem;
+  background: var(--color-surface);
+  border-radius: 2px;
+}
+
+.brand-mark::before {
+  content: '';
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  bottom: 4px;
+  border-bottom: 2px solid var(--color-pen);
+}
+
+.brand-mark::after {
+  content: '';
+  position: absolute;
+  right: -4px;
+  bottom: 6px;
+  width: 7px;
+  height: 5px;
+  background: var(--color-flag);
+}
+
+.app-bar :focus-visible {
+  outline-color: var(--color-flag);
+}
+
+.app-bar .button.quiet {
+  color: var(--color-surface);
+}
+
+/* Beats `.button.quiet:hover:not(:disabled)`, which would put light text on a light fill. */
+.app-bar .button.quiet:hover:not(:disabled) {
+  background: rgb(255 255 255 / 0.12);
+}
+
+/* Text that came with a document or a request (see lib/displayText.ts): its
+   direction never leaks into, or is taken from, the app's own words. */
+.untrusted-text,
+.field-content {
+  unicode-bidi: isolate;
+}
+
+/* ---------------------------------------------------------------- controls */
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--target);
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-s);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font: inherit;
+  font-weight: 600;
+  line-height: var(--leading-tight);
+  text-align: center;
+  cursor: pointer;
+}
+
+.button:hover:not(:disabled) {
+  border-color: var(--color-ink);
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  color: var(--color-ink-soft);
+  background: var(--color-surface-sunk);
+  border-color: var(--color-line);
+}
+
+.button.primary {
+  background: var(--color-pen);
+  border-color: var(--color-pen);
+  color: var(--color-on-pen);
+}
+
+.button.primary:hover:not(:disabled) {
+  background: var(--color-pen-strong);
+  border-color: var(--color-pen-strong);
+}
+
+.button.primary:disabled {
+  background: var(--color-surface-sunk);
+  border-color: var(--color-line);
+  color: var(--color-ink-soft);
+}
+
+.button.quiet {
+  border-color: transparent;
+  background: none;
+  font-weight: 500;
+}
+
+.button.quiet:hover:not(:disabled) {
+  background: var(--color-surface-sunk);
+  border-color: transparent;
+}
+
+.button.danger {
+  color: var(--color-danger);
+}
+
+.button.danger:not(.quiet) {
+  border-color: var(--color-danger);
+}
+
+.button.icon {
+  min-width: var(--target);
+  padding: 0;
+  font-size: var(--text-l);
+}
+
+.button.toggle {
+  min-height: 2.25rem;
+  padding: var(--space-1) var(--space-3);
+  font-weight: 500;
+}
+
+.button.toggle[aria-pressed='true'] {
+  background: var(--color-ink);
+  border-color: var(--color-ink);
+  color: var(--color-surface);
+}
+
+.link-button {
+  min-height: var(--target-min);
+  min-width: var(--target-min);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-pen);
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  cursor: pointer;
+}
+
+label,
+.field-label {
+  display: block;
+  font-size: var(--text-s);
+  font-weight: 600;
+}
+
+.input {
+  display: block;
+  width: 100%;
+  min-height: var(--target);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-s);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font: inherit;
+}
+
+textarea.input {
+  resize: vertical;
+}
+
+.input:disabled {
+  background: var(--color-surface-sunk);
+  color: var(--color-ink-soft);
+}
+
+.input[aria-invalid='true'] {
+  border-color: var(--color-danger);
+}
+
+.file-input {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-height: var(--target);
+  padding: var(--space-2);
+  border: 1px dashed var(--color-line-strong);
+  border-radius: var(--radius-s);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font: inherit;
+}
+
+.file-input::file-selector-button {
+  min-height: 2rem;
+  margin-right: var(--space-3);
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-s);
+  background: var(--color-surface-sunk);
+  color: var(--color-ink);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.file-input.large {
+  padding: var(--space-3);
+}
+
+.file-input.large::file-selector-button {
+  min-height: var(--target);
+  background: var(--color-pen);
+  border-color: var(--color-pen);
+  color: var(--color-on-pen);
+}
+
+.check-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  min-height: var(--target);
+  padding: var(--space-2) 0;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.check-row input,
+.radio-row input {
+  flex: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin: 0;
+  accent-color: var(--color-pen);
+}
+
+.hint {
+  color: var(--color-ink-soft);
+  font-size: var(--text-s);
+}
+
+.form-error,
+.notice {
+  padding: var(--space-3) var(--space-4);
+  border-left: 4px solid var(--color-danger);
+  border-radius: var(--radius-s);
+  background: var(--color-danger-wash);
+  color: var(--color-ink);
+  font-size: var(--text-s);
+}
+
+/* An error with its technical details below the sentence. */
+div.form-error {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.notice {
+  border-left-color: var(--color-pen);
+  background: var(--color-pen-wash);
+}
+
+.notice.success {
+  border-left-color: var(--color-done);
+  background: var(--color-done-wash);
+}
+
+.notice.warning {
+  border-left-color: var(--color-warn);
+  background: var(--color-warn-wash);
+}
+
+.form-item {
+  display: grid;
+  gap: var(--space-1);
+  align-content: start;
+}
+
+.form-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: end;
+}
+
+.form-grid > .form-item {
+  flex: 1 1 8rem;
+}
+
+.form-grid > .form-item.grow {
+  flex: 3 1 12rem;
+}
+
+.form-grid > .check-row.wide {
+  flex-basis: 100%;
+}
+
+.number-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(5.25rem, 1fr));
+  gap: var(--space-2);
+}
+
+.number-field {
+  display: grid;
+  gap: var(--space-1);
+  align-content: end;
+}
+
+.number-field label {
+  font-size: var(--text-xs);
+  white-space: nowrap;
+}
+
+.number-field .unit {
+  font-weight: 400;
+  color: var(--color-ink-soft);
+}
+
+.number-field .input {
+  padding-inline: var(--space-2);
+}
+
+.radio-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+}
+
+.radio-row legend {
+  width: 100%;
+  font-size: var(--text-s);
+  font-weight: 600;
+}
+
+.radio-row label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--target);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.button-row,
+.button-column {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.button-column {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.button-row.secondary {
+  justify-content: space-between;
+}
+
+/* ---------------------------------------------------------------- home */
+
+.home {
+  width: 100%;
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-4) var(--space-7);
+  display: grid;
+  gap: var(--space-5);
+}
+
+.home-intro h1 {
+  max-width: 18ch;
+  font-size: var(--text-xxl);
+  letter-spacing: -0.01em;
+}
+
+.lede {
+  max-width: var(--measure);
+  margin-top: var(--space-3);
+  font-size: var(--text-l);
+  color: var(--color-ink-soft);
+}
+
+.drop-zone,
+.card {
+  display: grid;
+  gap: var(--space-3);
+  align-content: start;
+  padding: var(--space-5);
+  background: var(--color-surface);
+  border-radius: var(--radius-m);
+}
+
+/* The drop zone is drawn as a sheet of paper with its signature line. */
+.drop-zone {
+  position: relative;
+  padding-bottom: var(--space-6);
+  box-shadow: var(--shadow-page);
+  border-radius: var(--radius-s);
+}
+
+.drop-zone::after {
+  content: '';
+  position: absolute;
+  left: var(--space-5);
+  right: var(--space-5);
+  bottom: var(--space-4);
+  border-bottom: 2px solid var(--color-line);
+}
+
+.drop-zone[data-over='true'] {
+  outline: 3px dashed var(--color-pen);
+  outline-offset: 4px;
+  background: var(--color-pen-wash);
+}
+
+.drop-zone h2,
+.home-route h2,
+.home-how h2 {
+  font-family: var(--font-doc);
+  font-size: var(--text-xl);
+  font-weight: 600;
+  line-height: var(--leading-tight);
+}
+
+.or-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.card {
+  border: var(--border);
+}
+
+.card.narrow {
+  max-width: 36rem;
+}
+
+.centered {
+  display: grid;
+  gap: var(--space-4);
+  justify-items: center;
+  align-content: start;
+  padding: var(--space-7) var(--space-4);
+}
+
+.verify-result h3 {
+  margin-top: var(--space-2);
+}
+
+/* ---------------------------------------------------------------- workspace */
+
+.workspace {
+  flex: none;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--panel-width);
+  grid-template-rows: minmax(0, 1fr);
+  height: calc(100dvh - var(--bar-height));
+  min-height: 0;
+  overflow: hidden;
+}
+
+.viewer {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+.viewer-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-surface);
+  border-bottom: var(--border);
+}
+
+.zoom-controls,
+.place-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.zoom-controls .button {
+  min-height: 2.25rem;
+  min-width: 2.25rem;
+  padding: 0 var(--space-2);
+}
+
+.zoom-value {
+  min-width: 3.25rem;
+  text-align: center;
+  font-size: var(--text-s);
+  font-variant-numeric: tabular-nums;
+}
+
+.place-tools-label {
+  margin-right: var(--space-1);
+  font-size: var(--text-s);
+  font-weight: 700;
+}
+
+/* Narrow screens: the field types stay in one row under the zoom controls and
+   scroll sideways. The right edge fades, so a button cut off there shows that
+   more types follow; the end padding lets the last button scroll clear of it. */
+@media (max-width: 56rem) {
+  .place-tools {
+    flex: 1 1 100%;
+    flex-wrap: nowrap;
+    min-width: 0;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: thin;
+    padding-inline-end: var(--space-6);
+    mask-image: linear-gradient(to right, #000 calc(100% - var(--space-6)), transparent);
+  }
+
+  .place-tools > * {
+    flex: none;
+  }
+
+  /* The scroller clips anything outside it, so the focus ring sits inside. */
+  .place-tools :focus-visible {
+    outline-offset: -3px;
+  }
+}
+
+.viewer-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  overscroll-behavior: contain;
+}
+
+.viewer-scroll:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: -3px;
+}
+
+.viewer-message {
+  margin: var(--space-6) auto;
+}
+
+.viewer-message.form-error {
+  width: min(100%, var(--measure));
+}
+
+.pdf-page {
+  position: relative;
+  flex: none;
+  margin: 0 auto;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-page);
+}
+
+.pdf-canvas {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.pdf-canvas canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* pdf.js text layer: transparent text placed exactly over the rendered glyphs. */
+.textLayer {
+  position: absolute;
+  inset: 0;
+  overflow: clip;
+  line-height: 1;
+  text-align: initial;
+  text-size-adjust: none;
+  -webkit-text-size-adjust: none;
+  forced-color-adjust: none;
+  transform-origin: 0 0;
+  z-index: 0;
+  /* pdf.js sizes the layer with round(down, …, var(--scale-round-x)). */
+  --scale-round-x: 1px;
+  --scale-round-y: 1px;
+  --min-font-size: 1;
+  --text-scale-factor: calc(var(--total-scale-factor) * var(--min-font-size));
+  --min-font-size-inv: calc(1 / var(--min-font-size));
+}
+
+/* A rotated page (/Rotate 90, 180, 270): pdf.js lays the layer out unrotated
+   and expects it to be turned about its top-left corner, as in its own viewer. */
+.textLayer[data-main-rotation='90'] {
+  transform: rotate(90deg) translateY(-100%);
+}
+
+.textLayer[data-main-rotation='180'] {
+  transform: rotate(180deg) translate(-100%, -100%);
+}
+
+.textLayer[data-main-rotation='270'] {
+  transform: rotate(270deg) translateX(-100%);
+}
+
+.textLayer :is(span, br) {
+  color: transparent;
+  position: absolute;
+  white-space: pre;
+  cursor: text;
+  transform-origin: 0% 0%;
+}
+
+.textLayer > :not(.markedContent),
+.textLayer .markedContent span:not(.markedContent) {
+  z-index: 1;
+  --font-height: 0;
+  font-size: calc(var(--text-scale-factor) * var(--font-height));
+  --scale-x: 1;
+  --rotate: 0deg;
+  transform: rotate(var(--rotate)) scaleX(var(--scale-x)) scale(var(--min-font-size-inv));
+}
+
+.textLayer .markedContent {
+  display: contents;
+}
+
+.textLayer ::selection {
+  background: rgb(29 63 174 / 0.25);
+}
+
+.textLayer .endOfContent {
+  display: none;
+}
+
+/* ---------------------------------------------------------------- field canvas */
+
+.field-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.field-canvas[data-placing='true'] {
+  pointer-events: auto;
+  cursor: crosshair;
+  background: rgb(29 63 174 / 0.05);
+  outline: 2px dashed var(--color-pen);
+  outline-offset: -2px;
+}
+
+.field-box {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  pointer-events: auto;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: grab;
+  container-type: size;
+  border: 1.5px solid var(--color-pen);
+  border-radius: 2px;
+  background: rgb(231 236 251 / 0.72);
+  color: var(--color-ink);
+}
+
+.field-box[data-locked='true'] {
+  cursor: default;
+  touch-action: auto;
+}
+
+.field-box[data-tone='todo'] {
+  border-color: var(--color-flag-ink);
+  background: rgb(255 216 77 / 0.5);
+}
+
+.field-box[data-tone='done'] {
+  border-color: var(--color-done);
+  background: rgb(225 242 233 / 0.35);
+}
+
+.field-box[data-tone='other'] {
+  border-style: dashed;
+  border-color: var(--color-line-strong);
+  background: rgb(243 245 249 / 0.6);
+  color: var(--color-ink-soft);
+}
+
+.field-box[data-tone='prefilled'] {
+  border-style: dashed;
+  border-color: var(--color-pen);
+  background: rgb(231 236 251 / 0.55);
+}
+
+.field-box[data-selected='true'] {
+  outline: 2px solid var(--color-pen);
+  outline-offset: 2px;
+  z-index: 3;
+}
+
+.field-box:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+  z-index: 3;
+}
+
+.field-content {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  padding: 0 0.3em 0.1em;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: clamp(7px, 62cqh, 15px);
+  line-height: 1;
+}
+
+.field-box[data-type='checkbox'] .field-content {
+  justify-content: center;
+  padding: 0;
+  font-size: 90cqh;
+  color: var(--color-ink);
+}
+
+.field-signature {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: left center;
+  pointer-events: none;
+}
+
+/* The flag: the one loud element, borrowed from paper "sign here" tabs. It
+   sits inside its box, at the left, and shrinks with the box: outside the box
+   it would cover the document's own text on a small screen. */
+.field-flag {
+  flex: none;
+  align-self: center;
+  max-width: 100%;
+  margin-left: 2px;
+  padding: 0.15em 0.5em;
+  overflow: hidden;
+  background: var(--color-flag);
+  color: var(--color-flag-ink);
+  font-size: clamp(7px, 55cqh, 11px);
+  font-weight: 700;
+  line-height: 1.3;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* The keyboard placement box: a field that is not on the page yet. Dashed and
+   hatched so it never reads as a placed field; its tag says how to commit it. */
+.field-ghost {
+  position: absolute;
+  z-index: 4;
+  pointer-events: none;
+  border: 2px dashed var(--color-pen);
+  border-radius: 2px;
+  background: repeating-linear-gradient(
+    -45deg,
+    color-mix(in srgb, var(--color-pen) 16%, transparent) 0 4px,
+    color-mix(in srgb, var(--color-pen) 4%, transparent) 4px 8px
+  );
+}
+
+.field-ghost-tag {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: -2px;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-s);
+  background: var(--color-pen);
+  color: var(--color-on-pen);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+.field-ghost-tag kbd {
+  border-color: color-mix(in srgb, var(--color-on-pen) 50%, transparent);
+  background: transparent;
+  color: inherit;
+}
+
+/* A numbered place for a field (M). The outline is hollow and the badge sits
+   beside it, so the printed label and line stay readable. Fields draw on top. */
+.place-mark {
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  outline: 1.5px dotted var(--color-pen);
+  outline-offset: 1px;
+  border-radius: 2px;
+}
+
+/* The badge straddles the top-right corner of the place: over blank space, clear
+   of the label before the place and of text after it on the same line. Its size
+   follows the zoom (--mark-size, set by FieldCanvas) within readable limits. */
+.place-mark-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-width: var(--mark-size, 20px);
+  height: var(--mark-size, 20px);
+  padding: 0 3px;
+  transform: translate(25%, -75%);
+  border: 1.5px solid var(--color-surface);
+  border-radius: 999px;
+  background: var(--color-pen);
+  color: var(--color-on-pen);
+  font-size: calc(var(--mark-size, 20px) * 0.62);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: calc(var(--mark-size, 20px) - 3px);
+  text-align: center;
+  box-shadow: 0 1px 2px rgb(20 33 61 / 0.3);
+}
+
+/* The place the new field is at. Its badge hides, since the placement box's tag
+   would cover it on a narrow place; the tag shows the number instead. */
+.place-mark[data-active='true'] {
+  outline-style: solid;
+}
+
+.place-mark[data-active='true'] .place-mark-badge {
+  visibility: hidden;
+}
+
+/* The number in the placement box's tag: the flag colour that means "a person acts here". */
+.field-ghost-place {
+  min-width: 1.5em;
+  padding: 0 3px;
+  border: 1.5px solid var(--color-flag-ink);
+  border-radius: 999px;
+  background: var(--color-flag);
+  color: var(--color-flag-ink);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.place-list {
+  display: grid;
+  gap: var(--space-1);
+  max-height: 18rem;
+  margin-top: var(--space-3);
+  overflow-y: auto;
+  list-style: none;
+}
+
+.place-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  min-height: var(--target);
+  padding: var(--space-2) var(--space-3);
+  border: var(--border);
+  border-radius: var(--radius-s);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font: inherit;
+  font-size: var(--text-s);
+  text-align: left;
+  cursor: pointer;
+}
+
+.place-item:hover {
+  border-color: var(--color-pen);
+  background: var(--color-pen-wash);
+}
+
+.place-item[aria-current='true'] {
+  border-color: var(--color-flag-ink);
+  background: var(--color-flag-wash);
+}
+
+.place-item-text {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.place-item-number {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.place-tools-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.field-handle {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--color-pen);
+  border-radius: 50%;
+  background: var(--color-surface);
+  touch-action: none;
+}
+
+/* A larger invisible hit area keeps the handles usable with a finger. */
+.field-handle::after {
+  content: '';
+  position: absolute;
+  inset: -10px;
+}
+
+.handle-nw {
+  left: -7px;
+  top: -7px;
+  cursor: nwse-resize;
+}
+
+.handle-ne {
+  right: -7px;
+  top: -7px;
+  cursor: nesw-resize;
+}
+
+.handle-sw {
+  left: -7px;
+  bottom: -7px;
+  cursor: nesw-resize;
+}
+
+.handle-se {
+  right: -7px;
+  bottom: -7px;
+  cursor: nwse-resize;
+}
+
+/* ---------------------------------------------------------------- panel */
+
+.panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--space-5) var(--space-4) var(--space-7);
+  background: var(--color-surface);
+  border-left: var(--border);
+}
+
+.panel-header {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.doc-name {
+  font-size: var(--text-s);
+  color: var(--color-ink-soft);
+  overflow-wrap: anywhere;
+}
+
+.panel-section {
+  display: grid;
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: var(--border);
+}
+
+.status-line {
+  /* The explicit min-height would otherwise let the scrolling panel shrink it below its text. */
+  flex: none;
+  min-height: 1.5rem;
+  font-size: var(--text-s);
+  color: var(--color-ink-soft);
+}
+
+.count {
+  display: inline-block;
+  min-width: 1.5rem;
+  padding: 0 var(--space-2);
+  border-radius: 999px;
+  background: var(--color-surface-sunk);
+  font-size: var(--text-s);
+  font-weight: 600;
+  text-align: center;
+}
+
+.empty {
+  color: var(--color-ink-soft);
+}
+
+.field-list,
+.review-list {
+  display: grid;
+  gap: var(--space-3);
+  list-style: none;
+}
+
+.field-row {
+  padding: var(--space-3);
+  border: var(--border);
+  border-radius: var(--radius-m);
+}
+
+.field-row[data-selected='true'] {
+  border-color: var(--color-pen);
+  box-shadow: inset 3px 0 0 var(--color-pen);
+}
+
+.field-row fieldset {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.field-row legend {
+  float: left;
+  width: 100%;
+  font-size: var(--text-s);
+}
+
+.type-chip {
+  display: inline-block;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-s);
+  background: var(--color-pen-wash);
+  color: var(--color-pen-strong);
+  font-weight: 700;
+}
+
+.type-chip[data-type='signature'],
+.type-chip[data-type='initials'] {
+  background: var(--color-flag);
+  color: var(--color-flag-ink);
+}
+
+.field-id {
+  color: var(--color-ink-soft);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}
+
+.row-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.row-actions .button {
+  min-height: 2.25rem;
+  padding: var(--space-1) var(--space-2);
+}
+
+.issues {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4) var(--space-3) calc(var(--space-4) + 1rem);
+  border-left: 4px solid var(--color-warn);
+  border-radius: var(--radius-s);
+  background: var(--color-warn-wash);
+  font-size: var(--text-s);
+}
+
+.details-form {
+  display: grid;
+  gap: var(--space-3);
+}
+
+/* JSON from an agent: monospace, wrapped anywhere, at least 16px (no iPhone zoom on focus). */
+.request-json {
+  min-height: 8rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-m);
+  overflow-wrap: anywhere;
+  resize: vertical;
+}
+
+.request-issues {
+  display: grid;
+  gap: var(--space-1);
+  padding-left: 1rem;
+  overflow-wrap: anywhere;
+}
+
+/* ---------------------------------------------------------------- sign view */
+
+/* App chrome, not document content: dark bar text that agents and people both read. */
+.agent-banner {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-s);
+  background: var(--color-ink);
+  color: var(--color-surface);
+  font-size: var(--text-s);
+  font-weight: 500;
+}
+
+/* Deliberately unlike app guidance: a quoted slip with its source named. */
+.preparer-note {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  border: 1px dashed var(--color-line-strong);
+  border-radius: var(--radius-s);
+  background: var(--color-surface-sunk);
+}
+
+.preparer-note-source {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--color-ink-soft);
+}
+
+.preparer-note-title {
+  font-family: var(--font-doc);
+  font-size: var(--text-l);
+  overflow-wrap: anywhere;
+}
+
+.preparer-note-text {
+  font-family: var(--font-doc);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.preparer-note-caveat {
+  font-size: var(--text-xs);
+  color: var(--color-ink-soft);
+}
+
+.progress {
+  position: sticky;
+  top: calc(-1 * var(--space-5));
+  z-index: 4;
+  display: grid;
+  gap: var(--space-1);
+  margin: 0 calc(-1 * var(--space-4));
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-flag-wash);
+  border-block: 1px solid var(--color-flag);
+  font-weight: 700;
+}
+
+.progress[data-complete='true'] {
+  background: var(--color-done-wash);
+  border-color: var(--color-done);
+}
+
+.progress progress {
+  width: 100%;
+  height: 0.5rem;
+  accent-color: var(--color-done);
+}
+
+.review-row {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: var(--border);
+  border-left: 4px solid var(--color-flag);
+  border-radius: var(--radius-s);
+}
+
+.review-row[data-done='true'] {
+  border-left-color: var(--color-done);
+}
+
+.review-row[data-selected='true'] {
+  background: var(--color-surface-sunk);
+}
+
+.review-label {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-1) var(--space-2);
+  font-size: var(--text-m);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.review-check {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+/* A value the request suggested for a field the person must answer. */
+.suggestion {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-left: 3px solid var(--color-flag);
+  background: var(--color-flag-wash);
+  color: var(--color-flag-ink);
+}
+
+.suggestion .hint {
+  color: inherit;
+}
+
+.review-check .suggestion {
+  flex: 1 0 100%;
+}
+
+.review-label-text {
+  font-size: var(--text-m);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.badges {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.badge {
+  padding: 0 var(--space-2);
+  border-radius: 999px;
+  background: var(--color-surface-sunk);
+  color: var(--color-ink-soft);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.badge[data-kind='required'] {
+  background: var(--color-flag-wash);
+  color: var(--color-flag-ink);
+}
+
+.badge[data-kind='prefilled'] {
+  background: var(--color-pen-wash);
+  color: var(--color-pen-strong);
+}
+
+.badge[data-kind='changed'] {
+  background: var(--color-warn-wash);
+  color: var(--color-warn);
+}
+
+.badge[data-kind='done'] {
+  background: var(--color-done-wash);
+  color: var(--color-done);
+}
+
+.review-signature {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.button.capture {
+  justify-content: flex-start;
+  min-height: 3.5rem;
+  border: 2px solid var(--color-flag-ink);
+  background: var(--color-flag);
+  color: var(--color-flag-ink);
+  font-size: var(--text-l);
+}
+
+.signature-preview {
+  display: block;
+  max-width: 100%;
+  height: 4rem;
+  object-fit: contain;
+  object-position: left center;
+  border-bottom: 2px solid var(--color-line-strong);
+}
+
+.review-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-s);
+  color: var(--color-ink-soft);
+}
+
+.required-mark {
+  font-size: var(--text-xs);
+  font-weight: 500;
+  color: var(--color-ink-soft);
+}
+
+.consent {
+  padding: var(--space-3);
+  border: var(--border);
+  border-radius: var(--radius-s);
+  background: var(--color-surface-sunk);
+}
+
+.sign-button {
+  width: 100%;
+  min-height: 3.5rem;
+  font-size: var(--text-l);
+  overflow-wrap: anywhere;
+}
+
+.hash {
+  display: block;
+  padding: var(--space-3);
+  border-radius: var(--radius-s);
+  background: var(--color-surface-sunk);
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+
+.hash.small {
+  margin-top: var(--space-1);
+  padding: var(--space-2);
+  font-size: var(--text-xs);
+}
+
+.audit-facts {
+  display: grid;
+  gap: var(--space-1);
+  font-size: var(--text-s);
+}
+
+.audit-facts dt {
+  margin-top: var(--space-2);
+  font-weight: 700;
+}
+
+.audit-group ul {
+  padding-left: 1.25rem;
+  font-size: var(--text-s);
+}
+
+.audit-passes {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.audit-passes li {
+  display: grid;
+  gap: 0 var(--space-2);
+}
+
+.audit-passes li > :first-child {
+  font-weight: 600;
+}
+
+.audit-pass-fields {
+  color: var(--color-ink-soft);
+  overflow-wrap: anywhere;
+}
+
+/* ---------------------------------------------------------------- signers in turn */
+
+/* The order the signers pass the device in: a numbered sequence of discs. */
+.turns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: turn;
+}
+
+.turns li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  column-gap: var(--space-2);
+  min-width: 0;
+  counter-increment: turn;
+  font-size: var(--text-s);
+}
+
+.turns li::before {
+  content: counter(turn);
+  grid-row: span 2;
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 2px solid var(--color-line-strong);
+  border-radius: 50%;
+  color: var(--color-ink-soft);
+  font-weight: 700;
+  font-size: var(--text-xs);
+}
+
+.turns li > :first-child {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.turn-state {
+  color: var(--color-ink-soft);
+  font-size: var(--text-xs);
+}
+
+.turns li[data-state='current']::before {
+  border-color: var(--color-pen);
+  background: var(--color-pen);
+  color: var(--color-on-pen);
+}
+
+.turns li[data-state='current'] .turn-state {
+  color: var(--color-pen-strong);
+  font-weight: 600;
+}
+
+.turns li[data-state='done']::before {
+  content: '✓';
+  border-color: var(--color-done);
+  background: var(--color-done-wash);
+  color: var(--color-done);
+}
+
+.turns li[data-state='next'] > :first-child {
+  color: var(--color-ink-soft);
+}
+
+/* A field another signer fills: present, but not this turn's to touch. */
+.review-row[data-locked='true'] {
+  border-left: 4px dashed var(--color-line-strong);
+  background: var(--color-surface-sunk);
+}
+
+.locked-value {
+  margin: 0;
+  color: var(--color-ink);
+  overflow-wrap: anywhere;
+}
+
+.badge[data-kind='other'] {
+  background: var(--color-surface);
+  border: var(--border);
+  color: var(--color-ink-soft);
+  white-space: normal;
+}
+
+.handoff {
+  display: grid;
+  gap: var(--space-4);
+  justify-items: start;
+}
+
+.handoff h1 {
+  margin: 0;
+  font-size: var(--text-xl);
+  overflow-wrap: anywhere;
+}
+
+.handoff p {
+  margin: 0;
+  max-width: var(--measure);
+}
+
+/* The record of an emailed hand-off: who it went to and until when the link works. */
+.sent-slip {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: var(--space-2) var(--space-4);
+  width: 100%;
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border: 1px dashed var(--color-line-strong);
+  border-radius: var(--radius-s);
+  background: var(--color-surface-sunk);
+}
+
+.sent-slip > div {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  align-items: baseline;
+}
+
+.sent-slip dt {
+  color: var(--color-ink-soft);
+  font-size: var(--text-s);
+}
+
+.sent-slip dd {
+  margin: 0;
+  font-family: var(--font-doc);
+  overflow-wrap: anywhere;
+}
+
+/* "Documents you sent": one block per kept hand-off, each with its slip and actions. */
+.sent-list {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.sent-list h1 {
+  margin: 0;
+  font-size: var(--text-xl);
+}
+
+.sent-list p {
+  margin: 0;
+  max-width: var(--measure);
+}
+
+.sent-items {
+  display: grid;
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sent-item {
+  display: grid;
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: var(--border);
+}
+
+.sent-item h2 {
+  margin: 0;
+  font-size: var(--text-m);
+  overflow-wrap: anywhere;
+}
+
+.sent-item .button {
+  overflow-wrap: anywhere;
+}
+
+/* ---------------------------------------------------------------- email the hand-off */
+
+.email-form {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.email-form p {
+  margin: 0;
+  max-width: var(--measure);
+}
+
+.email-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  padding-top: var(--space-2);
+}
+
+.code-input {
+  max-width: 10ch;
+  font-size: var(--text-xl);
+  letter-spacing: 0.2em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The first signer's collect card: the done heading carries the check. */
+.relay-collect-done {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* The Turnstile widget sizes itself; this keeps its place while it loads. */
+.turnstile-box {
+  min-height: 65px;
+}
+
+.email-progress {
+  padding: var(--space-3) 0;
+}
+
+/* ---------------------------------------------------------------- keyboard shortcuts */
+
+kbd {
+  display: inline-block;
+  min-width: 1.6em;
+  padding: 0 0.35em;
+  border: 1px solid var(--color-line-strong);
+  border-bottom-width: 2px;
+  border-radius: var(--radius-s);
+  background: var(--color-surface-sunk);
+  color: var(--color-ink);
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.shortcut-button {
+  margin-left: auto;
+  font-weight: 700;
+}
+
+.shortcut-list {
+  display: grid;
+  grid-template-columns: fit-content(40%) 1fr;
+  column-gap: var(--space-4);
+  margin: 0;
+}
+
+.shortcut-row {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  align-items: baseline;
+  padding: var(--space-2) 0;
+  border-top: var(--border);
+}
+
+.shortcut-row dt {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-2);
+}
+
+.shortcut-chord {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 2px;
+  color: var(--color-ink-soft);
+}
+
+.shortcut-row dd {
+  margin: 0;
+}
+
+/* ---------------------------------------------------------------- dialog */
+
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  padding: var(--space-4);
+  background: var(--color-backdrop);
+}
+
+.dialog {
+  display: flex;
+  flex-direction: column;
+  width: min(100%, 30rem);
+  max-height: calc(100dvh - 2 * var(--space-4));
+  background: var(--color-surface);
+  border-radius: var(--radius-m);
+  box-shadow: var(--shadow-dialog);
+}
+
+.dialog.wide {
+  width: min(100%, 38rem);
+}
+
+.dialog:focus {
+  outline: none;
+}
+
+.dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-3) var(--space-3) var(--space-5);
+  border-bottom: var(--border);
+}
+
+.dialog-header h2 {
+  font-family: var(--font-doc);
+  font-size: var(--text-l);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.dialog-body {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  overflow-y: auto;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  border-top: var(--border);
+}
+
+.tabs {
+  display: flex;
+  gap: var(--space-1);
+  border-bottom: var(--border);
+}
+
+.tab {
+  flex: 1;
+  min-height: var(--target);
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: none;
+  color: var(--color-ink-soft);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tab[aria-selected='true'] {
+  border-bottom-color: var(--color-pen);
+  color: var(--color-ink);
+}
+
+.tab-panel,
+.type-pane,
+.upload-pane,
+.draw-pane {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.draw-pad {
+  position: relative;
+  height: 11rem;
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-s);
+  background: var(--color-surface);
+}
+
+.draw-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  cursor: crosshair;
+  z-index: 1;
+}
+
+.draw-baseline {
+  position: absolute;
+  left: var(--space-5);
+  right: var(--space-5);
+  bottom: 28%;
+  border-bottom: 1.5px solid var(--color-line);
+}
+
+.draw-placeholder {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--color-line-strong);
+  pointer-events: none;
+}
+
+.draw-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+.typed-preview {
+  min-height: 5rem;
+  padding: var(--space-2) var(--space-4);
+  border-bottom: 1.5px solid var(--color-line-strong);
+  color: var(--color-ink);
+  font-size: 3rem;
+  line-height: 1.3;
+  white-space: pre;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.upload-preview {
+  max-width: 100%;
+  max-height: 9rem;
+  object-fit: contain;
+  border: var(--border);
+}
+
+.reuse-offer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-s);
+  background: var(--color-pen-wash);
+}
+
+.reuse-offer img {
+  height: 3rem;
+  max-width: 50%;
+  object-fit: contain;
+}
+
+/* ---------------------------------------------------------------- guided signing */
+
+/* The step the signer is on: which field, then its input below. */
+.guide-step {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.guide-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-1) var(--space-3);
+}
+
+.guide-eyebrow {
+  margin: 0;
+  font-size: var(--text-s);
+  font-weight: 600;
+  color: var(--color-ink-soft);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.all-fields-toggle {
+  font-size: var(--text-s);
+  font-weight: 600;
+}
+
+.guide-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font-size: var(--text-xl);
+  line-height: var(--leading-tight);
+  overflow-wrap: anywhere;
+}
+
+.guide-title > :first-child {
+  min-width: 0;
+}
+
+.done-mark {
+  display: inline-flex;
+  flex: none;
+}
+
+/* The done check: a filled green disc with a white tick. Always paired with words. */
+.check-icon {
+  flex: none;
+  width: var(--check-size);
+  height: var(--check-size);
+}
+
+.check-icon circle,
+.field-done circle {
+  fill: var(--color-done);
+}
+
+.check-icon path,
+.field-done path {
+  stroke: var(--color-on-pen);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.badge[data-kind='done'] {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25em;
+}
+
+.badge .check-icon {
+  width: 1em;
+  height: 1em;
+}
+
+/* On the page the check straddles the box's top-right corner, over the margin
+   of the box rather than the value, with a paper-white ring so it reads on any
+   tint. Its size does not follow the zoom. */
+.field-done {
+  position: absolute;
+  top: calc(var(--field-check-size) / -2);
+  right: calc(var(--field-check-size) / -2);
+  z-index: 2;
+  width: var(--field-check-size);
+  height: var(--field-check-size);
+  border-radius: 50%;
+  box-shadow: 0 0 0 1.5px var(--color-surface);
+  pointer-events: none;
+}
+
+.all-fields {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.all-fields[data-expanded='true'] {
+  padding-top: var(--space-4);
+  border-top: var(--border);
+}
+
+/* With every field shown, the step's own rows stand out. */
+.all-fields[data-expanded='true'] .review-row[data-current='true'] {
+  border-color: var(--color-pen);
+  box-shadow: 0 0 0 1px var(--color-pen);
+}
+
+.signature-preview.saved {
+  border-bottom-style: dashed;
+}
+
+/* What is not the current field: folded into one closed disclosure. */
+.sign-details {
+  border-top: var(--border);
+  padding-top: var(--space-3);
+}
+
+.sign-details > summary,
+.error-details > summary,
+.request-paste > summary {
+  display: flex;
+  align-items: center;
+  min-height: var(--target-min);
+  font-size: var(--text-s);
+  font-weight: 600;
+  color: var(--color-ink-soft);
+  cursor: pointer;
+}
+
+.sign-details > summary::before,
+.error-details > summary::before,
+.request-paste > summary::before {
+  content: '▸';
+  margin-right: var(--space-2);
+}
+
+.sign-details[open] > summary::before,
+.error-details[open] > summary::before,
+.request-paste[open] > summary::before {
+  content: '▾';
+}
+
+.sign-details-body,
+.error-details-body,
+.request-paste-body {
+  display: grid;
+  gap: var(--space-3);
+  padding-top: var(--space-3);
+}
+
+/* The report is copied, not read closely: monospace, wrapped anywhere, and at
+   least 16px so that iPhone Safari does not zoom in when it gets focus. */
+.error-details-text {
+  min-height: 8rem;
+  max-height: var(--details-max);
+  font-family: var(--font-mono);
+  font-size: var(--text-m);
+  line-height: var(--leading-tight);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.error-details-copy {
+  justify-self: start;
+}
+
+.browser-banner {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 4px solid var(--color-warn);
+  background: var(--color-warn-wash);
+  color: var(--color-ink);
+}
+
+.browser-banner-missing {
+  font-size: var(--text-s);
+  color: var(--color-ink-soft);
+  overflow-wrap: anywhere;
+}
+
+.sign-details .agent-banner {
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-xs);
+}
+
+/* The floating bar that drives the walk. A navy pen-cap over the desk, so it
+   never reads as part of the document; its main button turns flag-yellow when
+   the tap signs, like the "Sign here" flags on the page. */
+.guide-bar {
+  position: fixed;
+  bottom: var(--space-5);
+  left: calc((100vw - var(--panel-width)) / 2);
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  max-width: calc(100vw - var(--panel-width) - 2 * var(--space-5));
+  min-height: var(--guide-bar-height);
+  margin: 0;
+  padding: var(--space-2);
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: var(--color-ink);
+  color: var(--color-surface);
+  box-shadow: var(--shadow-dialog);
+}
+
+.guide-bar .button {
+  min-height: 3rem;
+  border-radius: 999px;
+}
+
+.guide-back {
+  flex: none;
+  width: 3rem;
+  padding: 0;
+  border-color: transparent;
+  background: rgb(255 255 255 / 0.12);
+  color: var(--color-surface);
+  font-size: var(--text-l);
+}
+
+.guide-back:hover:not(:disabled) {
+  background: rgb(255 255 255 / 0.22);
+}
+
+.guide-back:disabled {
+  opacity: 0.35;
+}
+
+.guide-count {
+  flex: none;
+  min-width: 4.5rem;
+  margin: 0;
+  font-size: var(--text-s);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.guide-next {
+  min-width: 9rem;
+  padding-inline: var(--space-5);
+  font-size: var(--text-l);
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.guide-bar .sign-button {
+  width: auto;
+  min-height: 3rem;
+}
+
+.guide-bar .guide-next[data-action='apply'],
+.guide-bar .guide-next[data-action='capture'],
+.guide-bar .guide-next[data-action='apply']:hover:not(:disabled),
+.guide-bar .guide-next[data-action='capture']:hover:not(:disabled) {
+  border-color: var(--color-flag);
+  background: var(--color-flag);
+  color: var(--color-flag-ink);
+}
+
+.guide-bar .button:focus-visible {
+  outline-color: var(--color-flag);
+}
+
+/* Nothing on the page hides under the floating bar. */
+.sign-workspace .viewer-scroll {
+  padding-bottom: calc(var(--guide-bar-height) + 2 * var(--space-5));
+}
+
+.consent input {
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+/* The one thing to do on the signed screen. */
+.download-signed {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-1);
+  width: 100%;
+  min-height: 3.5rem;
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-l);
+  text-align: left;
+}
+
+.download-name {
+  font-size: var(--text-s);
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+/* ---------------------------------------------------------------- narrow screens */
+
+@media (max-width: 56rem) {
+  .workspace {
+    /* Height of the sticky page view; the panel scrolls under it. */
+    --viewer-height: min(46dvh, 26rem);
+    display: block;
+    height: auto;
+    overflow: visible;
+  }
+
+  /* In prepare, anything scrolled into view in the panel (focus, a result) stops below the sticky page view. */
+  .workspace[data-view='prepare'] .panel * {
+    scroll-margin-top: calc(var(--bar-height) + var(--viewer-height) + var(--space-3));
+  }
+
+  /* The page stays in view at the top while the form scrolls under the thumb. */
+  .viewer {
+    position: sticky;
+    top: var(--bar-height);
+    z-index: 5;
+    height: var(--viewer-height);
+    border-bottom: 1px solid var(--color-line-strong);
+    background: var(--color-desk);
+  }
+
+  .viewer-scroll {
+    padding: var(--space-2);
+    gap: var(--space-2);
+  }
+
+  .viewer-toolbar {
+    padding: var(--space-1) var(--space-2);
+  }
+
+  .panel {
+    overflow: visible;
+    border-left: 0;
+    padding-bottom: calc(var(--space-7) + env(safe-area-inset-bottom));
+  }
+
+  .progress {
+    position: static;
+  }
+
+  .app-bar {
+    padding: 0 var(--space-2);
+    gap: var(--space-2);
+  }
+
+  .app-bar .button.quiet {
+    padding-inline: var(--space-2);
+    font-size: var(--text-s);
+  }
+
+  .home {
+    padding-top: var(--space-5);
+  }
+
+  .dialog-backdrop {
+    padding: var(--space-2);
+    place-items: end center;
+  }
+
+  .dialog-body {
+    padding-inline: var(--space-4);
+  }
+
+  .dialog-footer {
+    padding-inline: var(--space-4);
+  }
+
+  .dialog-footer .button,
+  .email-actions .button {
+    flex: 1;
+  }
+
+  .error-details-copy {
+    justify-self: stretch;
+  }
+}
+
+/* Touch targets: on a narrow screen or with a coarse pointer every button is at
+   least 44 by 44 CSS pixels. (Everywhere else the floor is --target-min, 24 px.) */
+@media (max-width: 56rem), (pointer: coarse) {
+  .sign-details > summary,
+  .error-details > summary {
+    min-height: var(--target);
+  }
+
+  .button,
+  .button.toggle,
+  .zoom-controls .button,
+  .row-actions .button,
+  .link-button,
+  .brand,
+  .tab {
+    min-height: var(--target);
+    min-width: var(--target);
+  }
+
+  .link-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .file-input::file-selector-button {
+    min-height: var(--target);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .button,
+  .field-box {
+    transition: background-color 120ms, border-color 120ms;
+  }
+}
+
+/* ---------------------------------------------------------------- sign view on a narrow screen */
+
+/* Phones and tablets: the document fills the screen and the current step sits
+   in a short bottom sheet whose last row is the Next bar, under the thumb.
+   "All fields" opens the sheet up to show everything. */
+@media (max-width: 56rem) {
+  .sign-workspace {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+    height: calc(100dvh - var(--bar-height));
+    overflow: hidden;
+  }
+
+  .sign-workspace .viewer {
+    position: static;
+    height: auto;
+    min-height: 0;
+    border-bottom: 0;
+  }
+
+  .sign-workspace .viewer-scroll {
+    padding-bottom: var(--space-4);
+  }
+
+  .sign-panel {
+    max-height: var(--sheet-max);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4) 0;
+    border-top: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-m) var(--radius-m) 0 0;
+    box-shadow: 0 -6px 18px rgb(20 33 61 / 0.12);
+  }
+
+  .sign-workspace[data-expanded='true'] .sign-panel {
+    max-height: var(--sheet-max-open);
+  }
+
+  .sign-workspace:not([data-expanded]) .sheet-extra {
+    display: none;
+  }
+
+  .guide-title {
+    font-size: var(--text-l);
+  }
+
+  /* In the short sheet the step title names the field; the row keeps its
+     label for assistive technology and drops what the title already says. */
+  .sign-workspace:not([data-expanded]) .review-row {
+    padding: 0;
+    border: 0;
+    background: none;
+  }
+
+  .sign-workspace:not([data-expanded]) .review-row:not([data-type='checkbox']) .review-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .sign-workspace:not([data-expanded]) .review-meta {
+    display: none;
+  }
+
+  /* Focused inputs stop clear of the bar and the on-screen keyboard. */
+  .sign-panel .input {
+    scroll-margin-block: var(--space-7);
+  }
+
+  .guide-bar {
+    position: sticky;
+    bottom: 0;
+    left: auto;
+    flex: none;
+    max-width: none;
+    margin: auto calc(-1 * var(--space-4)) 0;
+    padding: var(--space-2) var(--space-4) calc(var(--space-2) + env(safe-area-inset-bottom));
+    transform: none;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .guide-next {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .guide-count {
+    min-width: 3.5rem;
+  }
+}
+
+/* Looking back after the hand-off file is made: the fields only, nothing to act on. */
+.sign-panel[data-viewing='true'] > :is(.progress, .guide-step, .sign-off, .button-row.secondary, .guide-bar) {
+  display: none;
+}
+
+.app-bar-slot:empty {
+  display: none;
+}
+
+/* ---------------------------------------------------------------- home: two routes (#79)
+   The landing page: the two route cards (received a file / prepare a file),
+   the pair disclosure, "How it works" and the footer line. */
+
+.home-routes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+  gap: var(--space-5);
+  align-items: start;
+}
+
+/* The prepare card is a drop zone without the signature line that the verify page's drop zone keeps. */
+.drop-zone.home-route {
+  padding-bottom: var(--space-5);
+}
+
+.drop-zone.home-route::after {
+  content: none;
+}
+
+.home-pair {
+  border-top: var(--border);
+  padding-top: var(--space-3);
+}
+
+.home-pair > summary {
+  display: flex;
+  align-items: center;
+  min-height: var(--target);
+  font-size: var(--text-s);
+  font-weight: 600;
+  color: var(--color-ink-soft);
+  cursor: pointer;
+}
+
+.home-pair > summary::before {
+  content: '▸';
+  margin-right: var(--space-2);
+}
+
+.home-pair[open] > summary::before {
+  content: '▾';
+}
+
+.home-pair-body {
+  display: grid;
+  gap: var(--space-3);
+  padding-top: var(--space-3);
+}
+
+/* The way back to emailed documents: one quiet line, only when this device keeps some. */
+.home-sent {
+  color: var(--color-ink-soft);
+  font-size: var(--text-s);
+}
+
+.home-how {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.home-how-routes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+  gap: var(--space-5);
+}
+
+.home-how-routes > div {
+  display: grid;
+  gap: var(--space-2);
+  align-content: start;
+}
+
+.home-how h3 {
+  font-size: var(--text-m);
+}
+
+.home-how ol {
+  display: grid;
+  gap: var(--space-1);
+  padding-left: 1.25rem;
+  color: var(--color-ink-soft);
+}
+
+.home-footer {
+  display: grid;
+  gap: var(--space-2);
+  max-width: var(--measure);
+  padding-top: var(--space-4);
+  border-top: var(--border);
+  color: var(--color-ink-soft);
+  font-size: var(--text-s);
+}
+
+/* The agent sentence: a row at least one touch target tall. */
+.home-agent {
+  display: flex;
+  align-items: center;
+  min-height: var(--target);
+}
+
+/* ---------------------------------------------------------------- hand-off (#79 WP2) */
+
+/* The end of an earlier signer's turn: the ways to send it on, one under the other. */
+.turn-choices {
+  display: grid;
+  gap: var(--space-4);
+  /* The floating button scrolls the block into view: keep it clear of the bar. */
+  scroll-margin-block: var(--space-4) calc(var(--guide-bar-height) + var(--space-5));
+}
+
+/* The sent screen's ways on ("Email it again", the download), the full width of the card. */
+.sent-choices {
+  display: grid;
+  gap: var(--space-2);
+  justify-self: stretch;
+}
+
+/* All the choices the same size, the download too (it is also the .sign-button). */
+:is(.turn-choices, .sent-choices) .button {
+  width: 100%;
+  min-height: var(--target);
+  font-size: var(--text-m);
+  overflow-wrap: anywhere;
+}
+
+/* The next signer's address, with "Email it" directly under it. */
+.turn-email {
+  display: grid;
+  gap: var(--space-2);
+}
+
+/* A leading icon, the size of the text beside it. */
+.icon {
+  flex: none;
+  width: 1.25em;
+  height: 1.25em;
+}
+
+/* The message for the next signer: plain text to copy, in the app's own type. */
+.handoff-copy {
+  display: grid;
+  gap: var(--space-2);
+  justify-items: start;
+  width: 100%;
+}
+
+.handoff-copy-text {
+  width: 100%;
+  padding: var(--space-3);
+  border: 1px dashed var(--color-line-strong);
+  border-radius: var(--radius-s);
+  background: var(--color-surface-sunk);
+  color: var(--color-ink);
+  font: inherit;
+  font-size: var(--text-s);
+  line-height: 1.5;
+  resize: none;
+  field-sizing: content;
+}
+
+/* ---------------------------------------------------------------- signed view: one signer (#79 WP3) */
+
+/* One signer reads like one entry of the signers-in-turn list: name, time, fields. */
+.audit-pass {
+  display: grid;
+  gap: 0 var(--space-2);
+}
+
+.audit-pass > :first-child {
+  font-weight: 600;
+}

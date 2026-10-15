@@ -1,0 +1,25 @@
+{
+  "name": "@sign-pdf/core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "description": "Headless PDF inspect, resolve, prepare, finalize and verify. Runs in browsers and Node; no DOM or UI imports.",
+  "exports": {
+    ".": "./src/index.ts",
+    "./sign": "./src/sign.ts",
+    "./tools": "./src/tools.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@cantoo/fontkit": "^2.0.12",
+    "@cantoo/pdf-lib": "^2.11.1",
+    "@sign-pdf/spec": "workspace:*",
+    "fflate": "^0.8.3",
+    "pdfjs-dist": "^6.4.299",
+    "zod": "^4.6.5"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    // Held to the browser target (docs/browser-support.md): no ES2024+ library, and no
+    // DOM.AsyncIterable, so iterating a ReadableStream with for await is a type error.
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "jsx": "react-jsx",
+    "types": ["vite/client", "node"]
+  },
+  "include": ["src", "e2e", "vite.config.ts", "vitest.config.ts", "playwright.config.ts", "ports.ts", "browserTargets.ts"]
+}

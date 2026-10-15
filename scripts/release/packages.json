@@ -1,0 +1,6 @@
+{
+  "packages": [
+    { "kind": "mcp", "name": "@sign-pdf/mcp", "workspace": "packages/mcp" },
+    { "kind": "cli", "name": "@sign-pdf/cli", "workspace": "packages/cli" }
+  ]
+}

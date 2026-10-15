@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "document": {
+    "name": "synthetic-anchor-form.pdf",
+    "sha256": "77224425c119d291daa4e9e64ad0ef40d8973b182238004e8bf5da5dd9b64bbb"
+  },
+  "signers": [
+    { "id": "first", "name": "Signer One" },
+    { "id": "second", "name": "Signer Two" }
+  ],
+  "fields": [
+    {
+      "id": "first_signature",
+      "type": "signature",
+      "label": "First signer signature",
+      "assignee": "human",
+      "signerId": "first",
+      "placement": { "kind": "anchor", "text": "First signer:", "width": 180, "height": 32 }
+    },
+    {
+      "id": "second_signature",
+      "type": "signature",
+      "label": "Second signer signature",
+      "assignee": "human",
+      "signerId": "second",
+      "placement": { "kind": "anchor", "text": "Second signer:", "width": 180, "height": 32 }
+    }
+  ]
+}

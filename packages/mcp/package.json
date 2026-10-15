@@ -1,0 +1,37 @@
+{
+  "name": "@sign-pdf/mcp",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "description": "MCP server (stdio) exposing the prepare-side sign-pdf tools to agents. Signing is done only by the human, in their browser.",
+  "bin": {
+    "sign-pdf-mcp": "./dist/bin.js"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "build": "tsup && node ../cli/scripts/check-bundle.mjs dist/bin.js && node dist/bin.js --version && node scripts/smoke-stdio.mjs",
+    "smoke": "node scripts/smoke-stdio.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.1",
+    "@napi-rs/canvas": "^1.0.10",
+    "pdfjs-dist": "^6.4.299",
+    "zod": "^4.1.0"
+  },
+  "devDependencies": {
+    "@cantoo/pdf-lib": "^2.11.1",
+    "@sign-pdf/cli": "workspace:*",
+    "@sign-pdf/core": "workspace:*",
+    "@sign-pdf/spec": "workspace:*",
+    "tsup": "^8.5.1"
+  }
+}

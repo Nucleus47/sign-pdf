@@ -1,0 +1,14 @@
+{
+  "name": "sign-pdf",
+  "short_name": "sign-pdf",
+  "description": "Private, on-device PDF signing: prepare a PDF, then review and sign it in your browser. Nothing is uploaded.",
+  "icons": [
+    { "src": "/android-chrome-192x192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/android-chrome-512x512.png", "sizes": "512x512", "type": "image/png" }
+  ],
+  "theme_color": "#14213d",
+  "background_color": "#e6e9ef",
+  "display": "browser",
+  "start_url": "/",
+  "scope": "/"
+}

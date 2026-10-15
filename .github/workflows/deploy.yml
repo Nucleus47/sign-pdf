@@ -1,0 +1,100 @@
+name: Deploy
+
+# Publishes the Cloudflare Worker in packages/relay, which serves the built web app.
+# Production only, and only when the repository variable DEPLOY_ENABLED is "true".
+# Runs when the CI workflow finishes for a push to main, and publishes only if every
+# CI job (check and e2e) passed; it then builds and publishes that same commit.
+# Pull requests never deploy and never see deploy credentials.
+# CI runs on every push to main. If CI ever skips paths (docs only), change this too:
+# the tip check below would then skip a code commit that a docs-only commit follows.
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: read
+
+# One deploy at a time. A deploy for a commit that is no longer the tip of main stops
+# (see below), so CI finishing out of order or a re-run cannot publish older code.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: >-
+      vars.DEPLOY_ENABLED == 'true' &&
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'main' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: [self-hosted, u2-server]
+    timeout-minutes: 15
+    steps:
+      - name: Stop unless this commit is still the tip of main
+        id: tip
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TESTED: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          tip=$(gh api "repos/${{ github.repository }}/commits/main" --jq .sha)
+          if [ "$tip" = "$TESTED" ]; then
+            echo "current=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::main is now $tip; skipping the deploy of $TESTED. The newer commit's CI run deploys it."
+            echo "current=false" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/checkout@v4
+        if: steps.tip.outputs.current == 'true'
+        with:
+          # The commit CI tested, not whatever main points to now.
+          ref: ${{ github.event.workflow_run.head_sha }}
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+        if: steps.tip.outputs.current == 'true'
+        with:
+          # Per-runner install path: the default (~/setup-pnpm) is shared by every
+          # runner on the self-hosted machine and races between concurrent jobs.
+          dest: ${{ runner.tool_cache }}/setup-pnpm
+      - uses: actions/setup-node@v4
+        if: steps.tip.outputs.current == 'true'
+        with:
+          node-version: 22
+          # The self-hosted machine keeps a persistent pnpm store shared with
+          # other repositories; caching it here would upload all of it.
+          cache: ${{ runner.environment == 'github-hosted' && 'pnpm' || '' }}
+      - run: pnpm install --frozen-lockfile
+        if: steps.tip.outputs.current == 'true'
+      # CI ran the typecheck, lint, unit and end-to-end tests on this commit.
+      # The build runs the browser-target check again on what is published.
+      - run: pnpm build
+        if: steps.tip.outputs.current == 'true'
+        env:
+          # The commit stamp in error reports: the commit checked out and built above.
+          APP_COMMIT: ${{ github.event.workflow_run.head_sha }}
+      - uses: cloudflare/wrangler-action@v3
+        if: steps.tip.outputs.current == 'true'
+        env:
+          # Keep wrangler's logs out of the runner user's home directory; the
+          # runner wipes its temp directory after every job.
+          WRANGLER_LOG_PATH: ${{ runner.temp }}/wrangler-logs
+          WRANGLER_SEND_METRICS: "false"
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          # The Worker in packages/relay serves packages/web/dist (built above) as static assets.
+          # The token needs Workers Scripts Edit, Workers Routes Edit and Account Settings Read.
+          workingDirectory: packages/relay
+          # Use the wrangler version pinned in the lockfile, installed above.
+          packageManager: pnpm
+          command: deploy
+      # Self-hosted runners keep the workspace between jobs: leave no build output
+      # or wrangler state behind. The Cloudflare token only ever exists as a step
+      # environment variable; nothing writes it to disk. The checkout is skipped
+      # when the commit is no longer the tip, so clean only a checked-out tree.
+      - name: Clean workspace (self-hosted)
+        if: ${{ always() && runner.environment == 'self-hosted' }}
+        run: |
+          if [ -d .git ]; then git reset --hard --quiet && git clean -ffdx --quiet; fi
