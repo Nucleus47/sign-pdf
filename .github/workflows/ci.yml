@@ -10,29 +10,20 @@ permissions:
   contents: read
 
 jobs:
-  # All jobs run on the self-hosted u2 runner (private repository only). If it is
-  # down, jobs queue; they never fall back to GitHub-hosted minutes.
-  # A pull request from a fork never runs on the self-hosted runner: its code is
-  # untrusted. Before the repository goes public, move CI to GitHub-hosted runners.
+  # All jobs run on GitHub-hosted runners, so a pull request from a fork runs
+  # in a fresh machine with a read-only token and no secrets.
   check:
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
-    runs-on: [self-hosted, u2-server]
+    runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
       - uses: pnpm/action-setup@v4
-        with:
-          # Per-runner install path: the default (~/setup-pnpm) is shared by every
-          # runner on the self-hosted machine and races between concurrent jobs.
-          dest: ${{ runner.tool_cache }}/setup-pnpm
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          # The self-hosted machine keeps a persistent pnpm store shared with
-          # other repositories; caching it here would upload all of it.
-          cache: ${{ runner.environment == 'github-hosted' && 'pnpm' || '' }}
+          cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
       # Includes eslint-plugin-compat against the browser target (docs/browser-support.md).
@@ -40,15 +31,10 @@ jobs:
       - run: pnpm test
       # The web build ends with the browser-target check on the bundle (packages/web/scripts/check-bundle.mjs).
       - run: pnpm build
-      # Self-hosted runners keep the workspace between jobs: leave nothing behind.
-      - name: Clean workspace (self-hosted)
-        if: ${{ always() && runner.environment == 'self-hosted' }}
-        run: git reset --hard --quiet && git clean -ffdx --quiet
 
   # The Playwright version the lockfile resolves, so the e2e container image matches it.
   playwright-version:
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
-    runs-on: [self-hosted, u2-server]
+    runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
       version: ${{ steps.read.outputs.version }}
@@ -68,7 +54,7 @@ jobs:
   # The official Playwright image ships Chromium and its system packages, so no apt step can stall (#85).
   e2e:
     needs: playwright-version
-    runs-on: [self-hosted, u2-server]
+    runs-on: ubuntu-latest
     timeout-minutes: 15
     container:
       image: mcr.microsoft.com/playwright:v${{ needs.playwright-version.outputs.version }}-noble
@@ -97,18 +83,13 @@ jobs:
             e2e/test-results/
           retention-days: 7
           if-no-files-found: ignore
-      # The container runs as root on a shared self-hosted workspace: hand its files
-      # back to the runner user, or the next job's checkout cannot clean them.
-      - name: Return workspace ownership to the runner user
-        if: ${{ always() }}
-        run: chown -R "$(stat -c %u:%g /__w)" /__w
 
   # The relay round trip (packages/web/e2e/relay-worker.spec.ts): the built app
   # and the relay API under a local `wrangler dev` with the dev outbox and
   # Turnstile off. No Cloudflare account is used.
   relay-e2e:
     needs: playwright-version
-    runs-on: [self-hosted, u2-server]
+    runs-on: ubuntu-latest
     timeout-minutes: 15
     container:
       image: mcr.microsoft.com/playwright:v${{ needs.playwright-version.outputs.version }}-noble
@@ -152,8 +133,3 @@ jobs:
             packages/web/test-results/
           retention-days: 7
           if-no-files-found: ignore
-      # The container runs as root on a shared self-hosted workspace: hand its files
-      # back to the runner user, or the next job's checkout cannot clean them.
-      - name: Return workspace ownership to the runner user
-        if: ${{ always() }}
-        run: chown -R "$(stat -c %u:%g /__w)" /__w

@@ -30,7 +30,7 @@ jobs:
       github.event.workflow_run.event == 'push' &&
       github.event.workflow_run.head_branch == 'main' &&
       github.event.workflow_run.head_repository.full_name == github.repository
-    runs-on: [self-hosted, u2-server]
+    runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - name: Stop unless this commit is still the tip of main
@@ -54,17 +54,11 @@ jobs:
           persist-credentials: false
       - uses: pnpm/action-setup@v4
         if: steps.tip.outputs.current == 'true'
-        with:
-          # Per-runner install path: the default (~/setup-pnpm) is shared by every
-          # runner on the self-hosted machine and races between concurrent jobs.
-          dest: ${{ runner.tool_cache }}/setup-pnpm
       - uses: actions/setup-node@v4
         if: steps.tip.outputs.current == 'true'
         with:
           node-version: 22
-          # The self-hosted machine keeps a persistent pnpm store shared with
-          # other repositories; caching it here would upload all of it.
-          cache: ${{ runner.environment == 'github-hosted' && 'pnpm' || '' }}
+          cache: pnpm
       - run: pnpm install --frozen-lockfile
         if: steps.tip.outputs.current == 'true'
       # CI ran the typecheck, lint, unit and end-to-end tests on this commit.
@@ -77,8 +71,7 @@ jobs:
       - uses: cloudflare/wrangler-action@v3
         if: steps.tip.outputs.current == 'true'
         env:
-          # Keep wrangler's logs out of the runner user's home directory; the
-          # runner wipes its temp directory after every job.
+          # Keep wrangler's logs in the runner's temp directory.
           WRANGLER_LOG_PATH: ${{ runner.temp }}/wrangler-logs
           WRANGLER_SEND_METRICS: "false"
         with:
@@ -90,11 +83,3 @@ jobs:
           # Use the wrangler version pinned in the lockfile, installed above.
           packageManager: pnpm
           command: deploy
-      # Self-hosted runners keep the workspace between jobs: leave no build output
-      # or wrangler state behind. The Cloudflare token only ever exists as a step
-      # environment variable; nothing writes it to disk. The checkout is skipped
-      # when the commit is no longer the tip, so clean only a checked-out tree.
-      - name: Clean workspace (self-hosted)
-        if: ${{ always() && runner.environment == 'self-hosted' }}
-        run: |
-          if [ -d .git ]; then git reset --hard --quiet && git clean -ffdx --quiet; fi
