@@ -16,9 +16,13 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
+    <link rel="alternate" type="text/plain" title="Instructions for AI agents" href="/llms.txt" />
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Shown only until the app starts, so an agent that reads this page without running it finds its instructions. -->
+      <p>AI agents: read <a href="/llms.txt">/llms.txt</a> and the skill at <a href="/skill.md">/skill.md</a>. Install the MCP server with <code>npx -y @sign-pdf/mcp@latest</code>.</p>
+    </div>
     <noscript>sign-pdf needs JavaScript: it reads and signs the PDF in your browser.</noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>

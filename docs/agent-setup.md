@@ -1,31 +1,34 @@
 # Agent setup
 
-Use this guide to let an agent prepare a PDF and ask you to sign it. The npm packages are
-not published yet, so today you [build from a checkout](#install-from-a-checkout). When they
-are published, the one-line `npx` install below will work. Both routes need Node.js 22 or
-later.
+Use this guide to let an agent prepare a PDF and ask you to sign it. You need Node.js 22
+or later. The quickest route: give your agent the address https://sign.silv.app. The page
+points it to [llms.txt](https://sign.silv.app/llms.txt) and the
+[skill](https://sign.silv.app/skill.md), which tell it how to install and use sign-pdf.
 
 The agent can read the PDF, place fields, fill the fields it can fill, and mark what
 you must sign. Only you can sign, in your browser. The agent never gets a signing link.
 
-## Install from npm (once published)
+## Install from npm
 
-The packages are not on npm yet. This section applies once they are published.
-Install the MCP server:
-
-```bash
-npx -y @sign-pdf/mcp
-```
-
-Install the command-line tool:
+Run the MCP server:
 
 ```bash
-npx -y @sign-pdf/cli
+npx -y @sign-pdf/mcp@latest
 ```
+
+Run the command-line tool:
+
+```bash
+npx -y @sign-pdf/cli@latest --help
+```
+
+Keep the `@latest` tag. Without it, `npx` can keep running the copy it cached first. To see
+which version runs, compare `npm view @sign-pdf/mcp version` with
+`npx -y @sign-pdf/mcp@latest --version`.
 
 ## Register the MCP server
 
-For Claude Code, run `claude mcp add sign-pdf -- npx -y @sign-pdf/mcp`.
+For Claude Code, run `claude mcp add sign-pdf -- npx -y @sign-pdf/mcp@latest`.
 
 Claude Desktop, Cursor, VS Code, and other MCP clients can use this JSON:
 
@@ -34,7 +37,7 @@ Claude Desktop, Cursor, VS Code, and other MCP clients can use this JSON:
   "mcpServers": {
     "sign-pdf": {
       "command": "npx",
-      "args": ["-y", "@sign-pdf/mcp"]
+      "args": ["-y", "@sign-pdf/mcp@latest"]
     }
   }
 }
@@ -66,7 +69,7 @@ The full inputs and outputs are in the [MCP server README](../packages/mcp/READM
 
 ## Install from a checkout
 
-Until the packages are published, run from a checkout. At the repository root, run:
+To work on sign-pdf itself, run from a checkout. At the repository root, run:
 
 ```bash
 pnpm install

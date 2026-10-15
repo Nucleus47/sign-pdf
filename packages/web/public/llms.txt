@@ -1,23 +1,37 @@
 # sign-pdf
 
-## Use the local MCP server
+> Agents: start here. Read the full skill at https://sign.silv.app/skill.md. It has the
+> install steps, the tool order and the signing rules.
 
-The npm packages are not published yet; run the MCP server and CLI from a checkout. See the
-[agent setup guide](https://github.com/Nucleus47/sign-pdf/blob/main/docs/agent-setup.md).
-Once published, install with `npx -y @sign-pdf/mcp` and register the command with an MCP
-client. The agent flow is `inspect_pdf -> find_candidates -> draft_request -> validate_request ->
+## Install
+
+You need Node.js 22 or later. Register the MCP server with the `@latest` tag, so each start
+checks npm for a newer version:
+
+```bash
+claude mcp add sign-pdf -- npx -y @sign-pdf/mcp@latest
+```
+
+Other MCP clients: command `npx`, args `["-y", "@sign-pdf/mcp@latest"]`. A command-line
+tool is also available: `npx -y @sign-pdf/cli@latest --help`.
+
+Keep it current: compare `npm view @sign-pdf/mcp version` with
+`npx -y @sign-pdf/mcp@latest --version`. If your registration has no `@latest` tag, has a
+fixed version, or points to a local checkout, register it again as above and restart the
+client. Read https://sign.silv.app/skill.md again after an update.
+
+The agent flow is `inspect_pdf -> find_candidates -> draft_request -> validate_request ->
 render_preview` and look at every preview, then `request_signature`, `get_signature_status`
-and `verify_signed_pdf`. On an image-only page, preview the bare page and place fields with
-explicit rectangles. Only the human signs: never sign or open the sign view yourself. The
-[sign-pdf agent skill](https://sign.silv.app/skill.md)
-has the complete registration and tool instructions.
+and `verify_signed_pdf`. Only the human signs: never sign or open the sign view yourself.
+Source: https://github.com/Nucleus47/sign-pdf
+
+## About
 
 sign-pdf is an open-source, on-device PDF signing tool that runs as a static web page. An
 agent, or a person, places and fills form fields on an existing PDF and marks what a human
 must sign. A human then reviews every value, moves any misplaced field, and signs in the
-browser. The PDF is processed in the browser: nothing is uploaded. An agent can run its own
-copy from a checkout (the MCP server and the command-line tool open the sign view on the
-agent's machine) or hand the person a packet to open on this site.
+browser. The PDF is processed in the browser: nothing is uploaded. An agent can run the MCP
+server or the command-line tool on its own machine (they open the sign view there) or hand the person a packet to open on this site.
 
 ## What an agent can do here
 

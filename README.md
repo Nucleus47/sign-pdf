@@ -11,8 +11,8 @@ signs it. No account, no hosted signing service: everything runs on your device.
 
 Three ways to run it, all with the same code:
 
-1. **On the agent's machine.** Clone the repo; the agent uses the MCP server or the
-   command-line tool, which open the sign view in your browser from a local server.
+1. **On the agent's machine.** The agent runs the MCP server or the command-line tool from
+   npm, which open the sign view in your browser from a local server.
 2. **The agent keeps custody of the file.** It builds the packet and hands you the file,
    and you open it on a copy of the web app it hosts, or on [sign.silv.app](https://sign.silv.app).
 3. **In the browser only.** Open a PDF on the site, place the fields yourself, and sign.
@@ -25,9 +25,11 @@ for the modules and the sign request format in [`packages/spec`](packages/spec/s
 
 ## Use with an agent
 
-An agent can prepare a PDF through the local MCP server or the command-line tool, and
-you sign it in your browser. See [docs/agent-setup.md](docs/agent-setup.md) to build
-from a checkout and register the server. All docs pages are indexed in
+Give your agent the address https://sign.silv.app. The page points it to
+[llms.txt](https://sign.silv.app/llms.txt) and the [skill](https://sign.silv.app/skill.md),
+which tell it how to install the MCP server (`npx -y @sign-pdf/mcp@latest`), keep it
+current, and use it. You sign in your browser. See [docs/agent-setup.md](docs/agent-setup.md)
+for the details. All docs pages are indexed in
 [docs/README.md](docs/README.md).
 
 Coding agents can start with the [coding agent guide](docs/coding-agents.md), then follow the
