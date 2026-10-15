@@ -1,13 +1,20 @@
 import { expect, test } from '@playwright/test';
-import { expectOnlyOwnStaticAssets, showAllFields, watch } from './helpers.ts';
+import { drawSignature, expectOnlyOwnStaticAssets, showAllFields, watch } from './helpers.ts';
 
 /**
  * "Try the sample agreement" opens the agent demo (docs/demo.md): the NDA with
  * no form fields and the five demo fields of /demo-request.json, with plain
  * labels and demo values. The sign view keeps empty boxes empty.
  */
-test('the sample opens the demo: five plain fields, three for the human, and no label inside an empty box', async ({ page, baseURL }) => {
+test('the sample opens the demo: five plain fields, two steps for the signer, and no label inside an empty box', async ({ page, baseURL }) => {
   const seen = watch(page);
+  // Record whether the empty field list ever shows while the sample loads (#16).
+  await page.addInitScript(() => {
+    const flags = window as unknown as { sawNoFields?: boolean };
+    new MutationObserver(() => {
+      if (document.querySelector('[data-testid="no-fields"]')) flags.sawNoFields = true;
+    }).observe(document, { childList: true, subtree: true });
+  });
   await page.goto('/');
   await page.getByTestId('load-sample').click();
   await expect(page.getByTestId('app-root')).toHaveAttribute('data-state', 'preparing');
@@ -18,6 +25,8 @@ test('the sample opens the demo: five plain fields, three for the human, and no 
   await expect(page.getByTestId('use-acro-fields')).toHaveCount(0);
   // The paste box stays closed: the person did not paste anything.
   await expect(page.getByTestId('request-paste')).not.toHaveAttribute('open', '');
+  // The field list never said "No fields yet" while the demo request loaded.
+  expect(await page.evaluate(() => (window as unknown as { sawNoFields?: boolean }).sawNoFields ?? false)).toBe(false);
 
   await page.getByTestId('continue-to-sign').click();
   await expect(page.getByTestId('app-root')).toHaveAttribute('data-state', 'awaiting-human');
@@ -33,21 +42,33 @@ test('the sample opens the demo: five plain fields, three for the human, and no 
   for (const [id, label] of Object.entries(labels)) {
     await expect(page.getByTestId(`review-row-${id}`).locator('.review-label, label').first()).toContainText(label);
   }
-  // The agent filled the two party names with demo values. The human has three
-  // fields: the signature, the date (today's, already filled) and the print
-  // name (a demo value to keep or change). With the signer name and the
-  // confirmation box, four items wait.
+  // The agent filled the two party names, the print name and the signer name
+  // with demo values; the date is today's. The signer has two things to do:
+  // sign, and tick the confirmation box. No name is asked twice (#16).
   await expect(page.getByTestId('prefilled-party_a')).toBeVisible();
   await expect(page.getByTestId('prefilled-party_b')).toBeVisible();
+  await expect(page.getByTestId('prefilled-print_name')).toBeVisible();
   await expect(page.getByTestId('capture-signature')).toBeVisible();
   await expect(page.getByTestId('done-date')).toBeVisible();
-  await expect(page.getByTestId('keep-print_name')).toBeVisible();
-  await expect(page.getByTestId('progress-text')).toHaveText('0 of 4 required items done');
+  await expect(page.getByTestId('signer-name')).toHaveValue('Your Name');
+  await expect(page.getByTestId('progress-text')).toHaveText('0 of 2 required items done');
+  await expect(page.getByTestId('sign-button')).toBeDisabled();
   await expect(page.getByTestId('field-box-party_a')).toContainText('Example Co.');
   await expect(page.getByTestId('field-box-party_b')).toContainText('Sample Partner Co.');
 
   // An empty box shows no label: the side panel names it.
   await expect(page.getByTestId('field-box-signature').locator('.field-content')).toHaveText('');
+
+  // The count reaches N of N exactly when the Sign button turns on.
+  await page.getByTestId('capture-signature').click();
+  await drawSignature(page);
+  await page.getByTestId('signature-apply').click();
+  await expect(page.getByTestId('signature-dialog')).toBeHidden();
+  await expect(page.getByTestId('progress-text')).toHaveText('1 of 2 required items done');
+  await expect(page.getByTestId('sign-button')).toBeDisabled();
+  await page.getByTestId('consent').check();
+  await expect(page.getByTestId('progress-text')).toHaveText('2 of 2 required items done');
+  await expect(page.getByTestId('sign-button')).toBeEnabled();
 
   expectOnlyOwnStaticAssets(seen, baseURL!);
   expect(seen.problems).toEqual([]);

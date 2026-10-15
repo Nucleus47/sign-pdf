@@ -73,15 +73,15 @@ Tell the user this before you ask for their name, or in the same message as the 
 ### Ask first, and use demo values
 
 1. After you say where the data goes, ask the user: "Can I put your name and company on the demo NDA?"
-2. If the user says yes, use the user's company for Party A and the user's name for Print name. Ask for them if you do not know them.
-3. If the user says no, or does not answer, use the demo values: "Example Co." for Party A and "Your Name" for Print name.
+2. If the user says yes, use the user's company for Party A and the user's name for Print name and the signer name. Ask for them if you do not know them.
+3. If the user says no, or does not answer, use the demo values: "Example Co." for Party A and "Your Name" for Print name and the signer name.
 4. Party B is always the demo value "Sample Partner Co.". Put no other real information on the form.
 
 ### MCP route
 
 1. Download `https://sign.silv.app/demo-nda.pdf` to a local file. Call `inspect_pdf` and confirm that it has no form fields.
 2. Call `find_candidates`, then call `render_preview` with `mark_candidates: true`. Look at every page.
-3. Write the request. Start from https://sign.silv.app/demo-request.json: it has the five fields with plain labels, anchors and the demo values. Add `"version": 1` and `document` (the file name and the `sha256` from `inspect_pdf`). Change the values of `party_a` and `print_name` only if the user said yes.
+3. Write the request. Start from https://sign.silv.app/demo-request.json: it has the five fields with plain labels, anchors and the demo values. Add `"version": 1` and `document` (the file name and the `sha256` from `inspect_pdf`). Change the values of `party_a`, `print_name` and `signer.name` only if the user said yes.
 4. Call `validate_request` and fix every error and warning. Call `render_preview` and show the images to the user.
 5. Ask the user: "Do you want to sign it now to see the full flow?" Call `request_signature` only if the user says yes.
 
@@ -90,7 +90,7 @@ Tell the user this before you ask for their name, or in the same message as the 
 Use this route when you have a browser but no MCP server.
 
 1. Open https://sign.silv.app and press "Try the sample agreement". The demo NDA opens with the five fields and the demo values on the page.
-2. If the user said yes, download https://sign.silv.app/demo-request.json, change the values of `party_a` and `print_name`, and apply it: call `apply_request` (WebMCP or `window.signPdf`), or open "Paste a request from an agent", paste the JSON and press "Apply request". The request replaces the fields on the page.
+2. If the user said yes, download https://sign.silv.app/demo-request.json, change the values of `party_a`, `print_name` and `signer.name`, and apply it: call `apply_request` (WebMCP or `window.signPdf`), or open "Paste a request from an agent", paste the JSON and press "Apply request". The request replaces the fields on the page.
 3. Show the page to the user. Ask: "Do you want to sign it now to see the full flow?" Only if the user says yes, tell the user to check every field and press "Continue to sign". Never operate the sign view yourself.
 
 ## Fill now, sign later
