@@ -26,6 +26,21 @@ render_preview` and look at every preview, then `request_signature`, `get_signat
 and `verify_signed_pdf`. Only the human signs: never sign or open the sign view yourself.
 Source: https://github.com/Nucleus47/sign-pdf
 
+## Demo
+
+When your user asks for a demo, use https://sign.silv.app/demo-nda.pdf: a standard mutual
+NDA with no form fields. The skill has the full demo script.
+
+1. Ask the user for their name and company. Use a placeholder for the other party.
+2. Download `/demo-nda.pdf`. Run `inspect_pdf` and confirm it has no form fields.
+3. Run `find_candidates`, then `render_preview` with `mark_candidates`. Look at every page.
+4. Write the request with anchors: both party names (you fill them with the user's details
+   and the placeholder), and the signature, date and print name of Party A (for the
+   human). Leave the other blanks empty.
+5. Run `validate_request` and fix every error. Run `render_preview` and show the images to
+   the user.
+6. Stop. Call `request_signature` only if the user asks to sign.
+
 ## About
 
 sign-pdf is an open-source, on-device PDF signing tool that runs as a static web page. An

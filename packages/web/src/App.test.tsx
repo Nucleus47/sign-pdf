@@ -242,6 +242,10 @@ describe('the home page', () => {
     expect(received.getAttribute('accept')).toBe('.pdf,.json,application/pdf,application/json');
     expect(screen.getByTestId('home-agent')).toHaveTextContent('opens the document in your browser; you sign.');
     expect(screen.getByTestId('agent-link')).toHaveTextContent('llms.txt');
+    expect(screen.getByTestId('home-open-source')).toHaveTextContent('Open source under the MIT license.');
+    expect(screen.getByTestId('repo-link')).toHaveAttribute('href', 'https://github.com/Nucleus47/sign-pdf');
+    expect(screen.getByTestId('npm-mcp-link')).toHaveAttribute('href', 'https://www.npmjs.com/package/@sign-pdf/mcp');
+    expect(screen.getByTestId('npm-cli-link')).toHaveAttribute('href', 'https://www.npmjs.com/package/@sign-pdf/cli');
 
     fireEvent.change(received, { target: { files: [new File(['plain words'], 'holiday.txt', { type: 'text/plain' })] } });
     await act(() => vi.advanceTimersByTimeAsync(0));

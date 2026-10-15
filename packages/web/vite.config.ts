@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import react from '@vitejs/plugin-react';
 import { defineConfig, type Plugin } from 'vite';
 import { esbuildTargets } from './browserTargets.ts';
+import { flattenForDemo } from './demoNda.ts';
 import { derivedPort } from './ports.ts';
 
 /**
@@ -95,6 +96,29 @@ function agentSkill(): Plugin {
 }
 
 /**
+ * The demo document for agents, served at /demo-nda.pdf: the sample NDA with
+ * its form fields removed (demoNda.ts). It is made at build time, so no second
+ * PDF is kept in the repository.
+ */
+function demoNda(): Plugin {
+  const source = fileURLToPath(new URL('./public/sample-nda.pdf', import.meta.url));
+  return {
+    name: 'sign-pdf:demo-nda',
+    configureServer(server) {
+      server.middlewares.use('/demo-nda.pdf', (_request, response, next) => {
+        flattenForDemo(readFileSync(source)).then((pdf) => {
+          response.setHeader('Content-Type', 'application/pdf');
+          response.end(pdf);
+        }, next);
+      });
+    },
+    async generateBundle() {
+      this.emitFile({ type: 'asset', fileName: 'demo-nda.pdf', source: await flattenForDemo(readFileSync(source)) });
+    },
+  };
+}
+
+/**
  * The commit the app was built from, for error reports. APP_COMMIT names it
  * (deploy.yml passes the commit CI tested and checked out); else HEAD; else "unknown".
  * GITHUB_SHA is not used: in a workflow_run deploy it is not the commit that is built.
@@ -110,7 +134,7 @@ export function appCommit(): string {
 }
 
 export default defineConfig({
-  plugins: [react(), pdfjsAssets(), agentSkill()],
+  plugins: [react(), pdfjsAssets(), agentSkill(), demoNda()],
   define: { __APP_COMMIT__: JSON.stringify(appCommit()) },
   server: { port: derivedPort(), strictPort: true },
   preview: { port: derivedPort(1), strictPort: true, headers: headersForAllPaths() },
