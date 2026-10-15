@@ -7,7 +7,7 @@
   "fields": [
     {
       "id": "hereinafter_known_as",
-      "label": "hereinafter known as",
+      "label": "Text 4",
       "type": "text",
       "assignee": "human",
       "placement": {
@@ -17,7 +17,7 @@
     },
     {
       "id": "hereinafter_known_as_party_b",
-      "label": "hereinafter known as Party B",
+      "label": "Text 5",
       "type": "text",
       "assignee": "human",
       "placement": {

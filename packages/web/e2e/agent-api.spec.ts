@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { expectOnlyOwnStaticAssets, openSample, watch } from './helpers.ts';
+import { chooseSamplePdf, expectOnlyOwnStaticAssets, openSample, watch } from './helpers.ts';
 
 /** The browser agent API (issue #45): window.signPdf, the paste box, the #request= link and WebMCP. */
 
@@ -86,7 +86,7 @@ test('a #request= link puts its fields on the page once the sample opens', async
   // The request is taken out of the address bar at once.
   await expect.poll(() => new URL(page.url()).hash).toBe('');
   await expect(page.getByText('An agent’s request is waiting')).toBeVisible();
-  await page.getByTestId('load-sample').click();
+  await chooseSamplePdf(page);
   await expect(page.getByTestId('app-root')).toHaveAttribute('data-state', 'preparing');
   await expect(page.getByTestId('field-count')).toHaveText('4');
   await expect(page.getByTestId('request-result')).toContainText('4 fields');
@@ -99,7 +99,7 @@ test('a #request= link for another PDF stays waiting after the mismatch until th
   await expect(waiting).toBeVisible();
 
   const openSampleAgain = async () => {
-    await page.getByTestId('load-sample').click();
+    await chooseSamplePdf(page);
     await expect(page.getByTestId('app-root')).toHaveAttribute('data-state', 'preparing');
     await expect(page.getByTestId('request-result')).toContainText('This request was written for a different PDF');
   };
@@ -115,7 +115,7 @@ test('a #request= link for another PDF stays waiting after the mismatch until th
   await page.getByTestId('dismiss-request').click();
   await expect(page.getByTestId('request-result')).toHaveCount(0);
   await goHome();
-  await page.getByTestId('load-sample').click();
+  await chooseSamplePdf(page);
   await expect(page.getByTestId('app-root')).toHaveAttribute('data-state', 'preparing');
   await expect(page.getByTestId('request-result')).toHaveCount(0);
 });

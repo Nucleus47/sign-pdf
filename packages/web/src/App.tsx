@@ -40,7 +40,7 @@ type Screen =
   | { view: 'relay-open'; link: RelayLink & { key: string } }
   /** The first signer's return link: collect the signed PDF with the code from the email. */
   | { view: 'relay-collect'; id: string }
-  | { view: 'prepare'; document: LoadedDocument }
+  | { view: 'prepare'; document: LoadedDocument; demo?: boolean }
   | { view: 'sign'; job: SignJob }
   | { view: 'verify' }
   /** The hand-offs this device emailed, to send again (issue #98). */
@@ -119,8 +119,9 @@ export function App({ sessionNonce, sessionLinkReloaded = false, relayLink = nul
     setNotice(null);
     if (opened.kind === 'prepare') {
       dispatch({ type: 'reset' });
+      if (opened.request !== undefined) setPendingRequest(opened.request);
       setPrepareDocument(opened.document);
-      setScreen({ view: 'prepare', document: opened.document });
+      setScreen({ view: 'prepare', document: opened.document, ...(opened.demo ? { demo: true } : {}) });
     } else {
       setSignState('opening');
       setScreen({ view: 'sign', job: opened.job });
@@ -184,6 +185,8 @@ export function App({ sessionNonce, sessionLinkReloaded = false, relayLink = nul
       firstPaint.current = false;
       return;
     }
+    // A new view starts at its top, not at the old view's scroll position.
+    if (document.scrollingElement) document.scrollingElement.scrollTop = 0;
     const heading = document.querySelector<HTMLElement>('#main h1');
     if (!heading) return;
     heading.tabIndex = -1;
@@ -341,6 +344,7 @@ export function App({ sessionNonce, sessionLinkReloaded = false, relayLink = nul
           state={prepare}
           dispatch={dispatch}
           onContinue={continueToSign}
+          demo={screen.demo === true}
           {...(pendingRequest !== undefined ? { initialRequest: pendingRequest, onInitialRequestUsed: clearPendingRequest } : {})}
         />
       )}

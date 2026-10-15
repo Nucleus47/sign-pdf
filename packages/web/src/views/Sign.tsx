@@ -706,7 +706,8 @@ function Review({ job, resolved, onSigned, onBackToPrepare, onStartOver }: Revie
     const value = draft.values[canvasField.id];
     if (canvasField.type === 'checkbox') return value === true ? '✓' : '';
     if (typeof value === 'string' && value !== '') return value;
-    return canvasField.name;
+    // An empty box stays empty: a label inside it reads as a value. The side panel names the field.
+    return '';
   };
 
   // Top right of the app bar: the way between the hand-off screen and the document.

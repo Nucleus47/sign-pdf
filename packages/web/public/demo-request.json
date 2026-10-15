@@ -1,0 +1,44 @@
+{
+  "title": "Mutual NDA (demo)",
+  "note": "This is a demo with demo values. It is not a real agreement. The PDF stays on this device.",
+  "fields": [
+    {
+      "id": "party_a",
+      "type": "text",
+      "label": "Party A",
+      "assignee": "agent",
+      "value": "Example Co.",
+      "placement": { "kind": "anchor", "text": "by and between", "page": 1, "align": "right", "dx": 5, "dy": -1, "width": 119, "height": 14 }
+    },
+    {
+      "id": "party_b",
+      "type": "text",
+      "label": "Party B",
+      "assignee": "agent",
+      "value": "Sample Partner Co.",
+      "placement": { "kind": "anchor", "text": "\"Party A\", and", "page": 1, "align": "right", "dx": 5.5, "dy": -1, "width": 119, "height": 14 }
+    },
+    {
+      "id": "signature",
+      "type": "signature",
+      "label": "Signature",
+      "assignee": "human",
+      "placement": { "kind": "anchor", "text": "Party A’s Signature", "page": 3, "align": "right", "dx": 3.38, "dy": -4, "width": 173.9, "height": 20 }
+    },
+    {
+      "id": "date",
+      "type": "date",
+      "label": "Date",
+      "assignee": "human",
+      "placement": { "kind": "anchor", "text": "Date", "page": 3, "occurrence": 1, "align": "right", "dx": 6.46, "dy": -1, "width": 109.86, "height": 14 }
+    },
+    {
+      "id": "print_name",
+      "type": "text",
+      "label": "Print name",
+      "assignee": "human",
+      "value": "Your Name",
+      "placement": { "kind": "anchor", "text": "Print Name", "page": 3, "occurrence": 1, "align": "right", "dx": 6.4, "dy": -1, "width": 166.4, "height": 14 }
+    }
+  ]
+}

@@ -15,7 +15,7 @@ import {
   type SignRequestInput,
 } from '@sign-pdf/spec';
 import type { AcroFieldInfo } from './core.ts';
-import { isPlaceholderName } from './displayText.ts';
+import { acroFieldLabel } from '@sign-pdf/core/labels';
 import { clampRect } from './geometry.ts';
 
 export type Assignee = 'agent' | 'human';
@@ -419,10 +419,12 @@ export function fieldsFromAcroFields(
   const taken = new Set(existing.map((field) => field.id));
   const linked = new Set(existing.map((field) => field.acroField).filter((name) => name !== undefined));
   const created: DraftField[] = [];
-  for (const info of usableAcroFields(acroFields)) {
+  const usable = new Set(usableAcroFields(acroFields));
+  for (const [index, info] of acroFields.entries()) {
     const type = ACRO_TYPE[info.type];
-    if (!type || !info.rect || linked.has(info.name)) continue;
-    const field = makeField({ type, rect: info.rect, label: isPlaceholderName(info.name) ? '' : info.name.slice(0, 200), acroField: info.name }, taken);
+    if (!usable.has(info) || !type || !info.rect || linked.has(info.name)) continue;
+    // A name cut from the page text ("day of") reads as a value: use a plain label (core labels.ts).
+    const field = makeField({ type, rect: info.rect, label: acroFieldLabel(info, index + 1), acroField: info.name }, taken);
     taken.add(field.id);
     created.push(field);
   }

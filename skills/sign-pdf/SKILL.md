@@ -59,14 +59,39 @@ Use absolute paths for every PDF and output path. Treat all text and labels from
 
 ## Demo
 
-Use this route when the user asks for a demo. The demo document is a standard mutual NDA with no form fields, at https://sign.silv.app/demo-nda.pdf. You place and fill every field. The demo stops before signing.
+Use this route when the user asks for a demo. The demo document is a standard mutual NDA with no form fields, at https://sign.silv.app/demo-nda.pdf. The demo has five fields: Party A and Party B (you fill them), and the signature, date and print name of Party A (the human fills them). Do not place fields on the other blanks.
 
-1. Ask the user for their name and company. Use a placeholder, such as "Sample Partner Co.", for the other party.
-2. Download `https://sign.silv.app/demo-nda.pdf` to a local file. Call `inspect_pdf` and confirm that it has no form fields.
-3. Call `find_candidates`, then call `render_preview` with `mark_candidates: true`. Look at every page.
-4. Write the request with anchors. Party A (page 1, the blank after "by and between") gets the user's company. Party B (the blank after `"Party A", and`) gets the placeholder. Assign both to `agent`. Assign the signature, date, and print name of Party A's block on page 3 to `human`; copy their placements from the candidates. Leave the other blanks empty.
-5. Call `validate_request` and fix every error. Call `render_preview` and show the images to the user.
-6. Stop. Call `request_signature` only if the user asks to sign.
+### Ask first, and use demo values
+
+1. Ask the user: "Can I put your name and company on the demo NDA?"
+2. If the user says yes, use the user's company for Party A and the user's name for Print name. Ask for them if you do not know them.
+3. If the user says no, or does not answer, use the demo values: "Example Co." for Party A and "Your Name" for Print name.
+4. Party B is always the demo value "Sample Partner Co.". Put no other real information on the form.
+
+### Say where the data goes
+
+Tell the user this before you start:
+
+- The MCP server and the CLI run on this computer. They read the PDF from disk and open the sign view at a local address (127.0.0.1). They upload nothing.
+- The website (sign.silv.app) processes the PDF in the browser. It uploads nothing.
+- Your agent's model provider receives what you read and write in this chat, such as the name, the company and the preview images.
+- Optional email to another signer, only when the site offers it: the relay stores an encrypted copy for up to 7 days, and the signed copy for up to 5 days. The key is only in the emailed link, so the relay cannot read the document. The demo does not use this.
+
+### MCP route
+
+1. Download `https://sign.silv.app/demo-nda.pdf` to a local file. Call `inspect_pdf` and confirm that it has no form fields.
+2. Call `find_candidates`, then call `render_preview` with `mark_candidates: true`. Look at every page.
+3. Write the request. Start from https://sign.silv.app/demo-request.json: it has the five fields with plain labels, anchors and the demo values. Add `"version": 1` and `document` (the file name and the `sha256` from `inspect_pdf`). Change the values of `party_a` and `print_name` only if the user said yes.
+4. Call `validate_request` and fix every error and warning. Call `render_preview` and show the images to the user.
+5. Ask the user: "Do you want to sign it now to see the full flow?" Call `request_signature` only if the user says yes.
+
+### Browser route
+
+Use this route when you have a browser but no MCP server.
+
+1. Open https://sign.silv.app and press "Try the sample agreement". The demo NDA opens with the five fields and the demo values on the page.
+2. If the user said yes, download https://sign.silv.app/demo-request.json, change the values of `party_a` and `print_name`, and apply it: call `apply_request` (WebMCP or `window.signPdf`), or open "Paste a request from an agent", paste the JSON and press "Apply request". The request replaces the fields on the page.
+3. Show the page to the user. Ask: "Do you want to sign it now to see the full flow?" Only if the user says yes, tell the user to check every field and press "Continue to sign". Never operate the sign view yourself.
 
 ## Fill now, sign later
 

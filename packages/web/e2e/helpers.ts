@@ -42,10 +42,26 @@ export function expectOnlyOwnStaticAssets(seen: Watch, baseURL: string): void {
   expect(api, 'requests to /api without a session').toEqual([]);
 }
 
+/** Choose sample-nda.pdf in the start page's PDF picker. */
+export async function chooseSamplePdf(page: Page): Promise<void> {
+  await page.getByTestId('open-pdf-input').setInputFiles({ name: 'sample-nda.pdf', mimeType: 'application/pdf', buffer: await readSample() });
+}
+
+/** Choose sample-nda.pdf from the start page's PDF picker while it has focus, with the keyboard. */
+export async function chooseSamplePdfByKeyboard(page: Page): Promise<void> {
+  const [chooser] = await Promise.all([page.waitForEvent('filechooser'), page.keyboard.press('Space')]);
+  await chooser.setFiles({ name: 'sample-nda.pdf', mimeType: 'application/pdf', buffer: await readSample() });
+}
+
+/**
+ * Open the sample NDA with its form fields (sample-nda.pdf) in the prepare
+ * view, with no fields placed. The start page's "Try the sample agreement"
+ * opens the demo instead (demo.spec.ts).
+ */
 export async function openSample(page: Page): Promise<void> {
   await page.goto('/');
   await expect(page.getByTestId('app-root')).toHaveAttribute('data-state', 'empty');
-  await page.getByTestId('load-sample').click();
+  await chooseSamplePdf(page);
   await expect(page.getByTestId('app-root')).toHaveAttribute('data-state', 'preparing');
   await expect(page.getByTestId('pdf-page-3')).toBeVisible();
 }

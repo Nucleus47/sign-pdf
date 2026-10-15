@@ -136,6 +136,21 @@ test('demo: a scripted agent places and fills fields on the flat NDA, and the hu
       expect(intersectionOverUnion(field.rect, EXPECTED[field.id]!), field.id).toBeGreaterThanOrEqual(IOU_THRESHOLD);
     }
 
+    // The ready request for both routes (/demo-request.json, also what the start
+    // page's sample opens) validates and puts the same fields on the same blanks.
+    const ready = JSON.parse(await readFile(join(WEB_DIR, 'demo-request.json'), 'utf8')) as Omit<SignRequestInput, 'version' | 'document'>;
+    expect(ready).not.toHaveProperty('document');
+    const readyReport = (
+      await call('validate_request', { pdf_path: pdfPath, request: { version: 1, document: request.document, ...ready } })
+    ).structuredContent;
+    expect(readyReport['errors']).toEqual([]);
+    expect(readyReport['warnings']).toEqual([]);
+    const readyFields = readyReport['fields'] as Array<{ id: string; rect: Rect }>;
+    expect(readyFields.map((field) => field.id).sort()).toEqual(Object.keys(EXPECTED).sort());
+    for (const field of readyFields) {
+      expect(intersectionOverUnion(field.rect, EXPECTED[field.id]!), `demo-request.json ${field.id}`).toBeGreaterThanOrEqual(IOU_THRESHOLD);
+    }
+
     const preview = await call('render_preview', { pdf_path: pdfPath, request });
     const images = preview.structuredContent['images'] as Array<{ page: number; field_ids: string[] }>;
     expect(images.map((image) => [image.page, [...image.field_ids].sort()])).toEqual([

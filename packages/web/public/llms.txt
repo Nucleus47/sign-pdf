@@ -29,17 +29,31 @@ Source: https://github.com/Nucleus47/sign-pdf
 ## Demo
 
 When your user asks for a demo, use https://sign.silv.app/demo-nda.pdf: a standard mutual
-NDA with no form fields. The skill has the full demo script.
+NDA with no form fields. The demo has five fields: Party A and Party B (you fill them), and
+the signature, date and print name of Party A (the human fills them). Do not place fields
+on the other blanks. The skill has the full demo script.
 
-1. Ask the user for their name and company. Use a placeholder for the other party.
-2. Download `/demo-nda.pdf`. Run `inspect_pdf` and confirm it has no form fields.
-3. Run `find_candidates`, then `render_preview` with `mark_candidates`. Look at every page.
-4. Write the request with anchors: both party names (you fill them with the user's details
-   and the placeholder), and the signature, date and print name of Party A (for the
-   human). Leave the other blanks empty.
-5. Run `validate_request` and fix every error. Run `render_preview` and show the images to
-   the user.
-6. Stop. Call `request_signature` only if the user asks to sign.
+1. Ask the user: "Can I put your name and company on the demo NDA?" On yes, use the user's
+   company for Party A and the user's name for Print name. On no, use the demo values
+   "Example Co." and "Your Name". Party B is always "Sample Partner Co.". Put no other real
+   information on the form.
+2. Tell the user where the data goes. The MCP server and the CLI run on this computer and
+   upload nothing; the sign view opens at a local address (127.0.0.1). This website
+   processes the PDF in the browser and uploads nothing. Your agent's model provider
+   receives what you read and write in the chat. Only the optional email to another signer
+   stores an encrypted copy on the relay, for up to 7 days (the signed copy up to 5 days);
+   the demo does not use it.
+3. The ready request is https://sign.silv.app/demo-request.json: the five fields with plain
+   labels and the demo values. Change `party_a` and `print_name` only after a yes.
+   - MCP route: download `/demo-nda.pdf`, run `inspect_pdf` (no form fields),
+     `find_candidates` and `render_preview` with `mark_candidates`. Add `version` and
+     `document` (name and `sha256`) to the request. Run `validate_request`, then
+     `render_preview`, and show the images to the user.
+   - Browser route: press "Try the sample agreement" on https://sign.silv.app. The demo
+     opens with the five fields and the demo values. After a yes, apply the changed request
+     with `apply_request` or the paste box ("Paste a request from an agent").
+4. Ask: "Do you want to sign it now to see the full flow?" Only on yes, call
+   `request_signature` (MCP), or tell the user to press "Continue to sign" (browser).
 
 ## About
 
@@ -68,7 +82,8 @@ can also give the person a packet to open on this site.
 ## Browser agent API
 
 An agent that has only a browser can prepare a PDF on this site. Open a PDF in the prepare
-view (or press "Try the sample"). The API exists only while the prepare view is open. Use
+view (or press "Try the sample agreement" for the demo). The API exists only while the
+prepare view is open. Use
 the first route that works:
 
 1. WebMCP: in a browser with WebMCP, the page registers its tools with the browser's model

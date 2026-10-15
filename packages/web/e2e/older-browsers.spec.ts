@@ -91,6 +91,11 @@ async function removeNewFeaturesEverywhere(page: Page): Promise<void> {
   });
 }
 
+// A worker that starts as a test ends must not fail it in the route handler.
+test.afterEach(async ({ page }) => {
+  await page.unrouteAll({ behavior: 'ignoreErrors' });
+});
+
 /** The feature report of each live pdf.js worker; pdf.js may have closed earlier ones. */
 async function workerReports(page: Page): Promise<Record<string, boolean>[]> {
   const workers = page.workers().filter((worker) => /\/assets\/pdf\.worker-/.test(worker.url()));
@@ -108,6 +113,8 @@ test('opens a PDF in a browser without the features Safari 16.4 lacks', async ({
   await page.getByTestId('load-sample').click();
   await expect(page.getByTestId('app-root')).toHaveAttribute('data-view', 'prepare');
   await expect(page.locator('[data-page] canvas').first()).toBeVisible();
+  // The sample's demo fields are anchored on the page text, so they resolve only when the text can be read.
+  await expect(page.getByTestId('field-count')).toHaveText('5');
   // Reading the page text is what failed on an older iPhone: the text layer and candidates use it.
   await expect(page.locator('.textLayer span').first()).toBeAttached();
   expect(errors).toEqual([]);
