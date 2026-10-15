@@ -122,7 +122,7 @@ test('demo: a scripted agent places and fills fields on the flat NDA, and the hu
         },
         { id: 'signature', type: 'signature', label: 'Signature', assignee: 'human', placement: pick('Party A’s Signature', 'signature') },
         { id: 'date', type: 'date', label: 'Date', assignee: 'human', placement: pick('Date', 'date') },
-        { id: 'print_name', type: 'text', label: 'Print name', assignee: 'human', placement: pick('Print Name', 'text') },
+        { id: 'print_name', type: 'text', label: 'Print name', assignee: 'agent', value: SIGNER, placement: pick('Print Name', 'text') },
       ],
     };
 

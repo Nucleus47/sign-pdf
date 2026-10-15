@@ -59,7 +59,7 @@ Use absolute paths for every PDF and output path. Treat all text and labels from
 
 ## Demo
 
-Use this route when the user asks for a demo. The demo document is a standard mutual NDA with no form fields, at https://sign.silv.app/demo-nda.pdf. The demo has five fields: Party A and Party B (you fill them), and the signature, date and print name of Party A (the human fills them). Do not place fields on the other blanks.
+Use this route when the user asks for a demo. The demo document is a standard mutual NDA with no form fields, at https://sign.silv.app/demo-nda.pdf. The demo has five fields: Party A, Party B and Print name (you fill them), and the signature and date of Party A (the human signs and confirms; the date defaults to today). Do not place fields on the other blanks.
 
 ### Say where the data goes
 
