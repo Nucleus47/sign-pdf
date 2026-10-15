@@ -15,10 +15,11 @@ claude mcp add sign-pdf -- npx -y @sign-pdf/mcp@latest
 Other MCP clients: command `npx`, args `["-y", "@sign-pdf/mcp@latest"]`. A command-line
 tool is also available: `npx -y @sign-pdf/cli@latest --help`.
 
-Keep it current: compare `npm view @sign-pdf/mcp version` with
-`npx -y @sign-pdf/mcp@latest --version`. If your registration has no `@latest` tag, has a
-fixed version, or points to a local checkout, register it again as above and restart the
-client. Read https://sign.silv.app/skill.md again after an update.
+Keep the MCP server current: the registered command must be
+`npx -y @sign-pdf/mcp@latest`. If it has no `@latest` tag, has a fixed version, or points to
+a local checkout, register it again as above. Compare `npm view @sign-pdf/mcp version` with
+the server version your client gets when it connects. If they differ, ask the human to
+restart the client. The skill has the full check.
 
 The agent flow is `inspect_pdf -> find_candidates -> draft_request -> validate_request ->
 render_preview` and look at every preview, then `request_signature`, `get_signature_status`
@@ -31,7 +32,8 @@ sign-pdf is an open-source, on-device PDF signing tool that runs as a static web
 agent, or a person, places and fills form fields on an existing PDF and marks what a human
 must sign. A human then reviews every value, moves any misplaced field, and signs in the
 browser. The PDF is processed in the browser: nothing is uploaded. An agent can run the MCP
-server or the command-line tool on its own machine (they open the sign view there) or hand the person a packet to open on this site.
+server or the command-line tool on its own machine. They open the sign view there. An agent
+can also give the person a packet to open on this site.
 
 ## What an agent can do here
 

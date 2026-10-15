@@ -9,7 +9,7 @@ Use sign-pdf to inspect a PDF, prepare fields, and hand it to the human. Only th
 
 ## Install and register
 
-You need Node.js 22 or later. Register the MCP server with the `@latest` tag. With the tag, `npx` checks npm for a newer version each time the client starts the server, so you never keep running an old version.
+You need Node.js 22 or later. Register the MCP server with the `@latest` tag. With the tag, `npx` checks npm for a newer version each time the client starts the server. The first start downloads about 10 MB, so it can take a minute.
 
 For Claude Code:
 
@@ -30,20 +30,19 @@ For Claude Desktop, Cursor, VS Code, and other clients that accept MCP server JS
 }
 ```
 
-Restart the client after you register the server. The CLI is also available:
+Restart the client after you register the server. The command-line tool (CLI) is also available:
 
 ```bash
 npx -y @sign-pdf/cli@latest --help
 ```
 
-### Keep it current
+### Keep the MCP server current
 
 Do this check at the start of a session, and when a tool fails in a way this skill does not explain:
 
-1. Read the published version: `npm view @sign-pdf/mcp version`.
-2. Read the version you run: `npx -y @sign-pdf/mcp@latest --version`. The MCP client also gets it as the server version when it connects.
-3. If your registration has no `@latest` tag, has a fixed version, or points to a local checkout, change it to the commands above and restart the client.
-4. Read this skill again at https://sign.silv.app/skill.md. It changes with each release.
+1. Check the registration: run `claude mcp get sign-pdf`, or read the MCP JSON of your client. The command must be `npx -y @sign-pdf/mcp@latest`. If it has no `@latest` tag, has a fixed version, or points to a local checkout, register it again with the commands above.
+2. Read the published version: `npm view @sign-pdf/mcp version`. Compare it with the version of the running server, which your client gets as the server version when it connects. A running server keeps its version until the client starts it again. If the two versions differ, ask the human to restart the client.
+3. Read this skill again at https://sign.silv.app/skill.md. It changes with each release.
 
 ## Follow this tool order
 

@@ -22,9 +22,9 @@ Run the command-line tool:
 npx -y @sign-pdf/cli@latest --help
 ```
 
-Keep the `@latest` tag. Without it, `npx` can keep running the copy it cached first. To see
-which version runs, compare `npm view @sign-pdf/mcp version` with
-`npx -y @sign-pdf/mcp@latest --version`.
+Keep the `@latest` tag. Without it, `npx` can keep running the copy it cached first. A
+running server keeps its version until the client starts it again. The
+[skill](https://sign.silv.app/skill.md) has the full version check.
 
 ## Register the MCP server
 
