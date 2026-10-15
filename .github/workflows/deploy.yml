@@ -58,7 +58,7 @@ jobs:
         if: steps.tip.outputs.current == 'true'
         with:
           node-version: 22
-          cache: pnpm
+          # No dependency cache: a poisoned cache would run with this job's rights.
       - run: pnpm install --frozen-lockfile
         if: steps.tip.outputs.current == 'true'
       # CI ran the typecheck, lint, unit and end-to-end tests on this commit.
