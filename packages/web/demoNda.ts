@@ -1,4 +1,4 @@
-import { PDFArray, PDFDict, PDFDocument, PDFName, PDFRef } from '@cantoo/pdf-lib';
+import { PDFArray, PDFDict, PDFDocument, PDFName, PDFRef, PDFStream, type PDFContext, type PDFObject } from '@cantoo/pdf-lib';
 
 /**
  * The demo document for agents: the sample NDA with its form fields removed,
@@ -41,5 +41,35 @@ export async function flattenForDemo(input: Uint8Array): Promise<Uint8Array> {
   }
 
   for (const ref of removed) context.delete(ref);
+  pruneUnreachable(context);
   return doc.save({ useObjectStreams: false });
+}
+
+/**
+ * Delete every object that the document no longer reaches from its catalog or
+ * its info dictionary: the old form dictionary and annotation arrays, widget
+ * appearances and fonts, and the cross-reference and linearization objects of
+ * the input.
+ */
+function pruneUnreachable(context: PDFContext): void {
+  const reached = new Set<PDFRef>();
+  const pending: PDFObject[] = [context.trailerInfo.Root, context.trailerInfo.Info].filter((root): root is PDFObject => !!root);
+  while (pending.length > 0) {
+    const object = pending.pop()!;
+    if (object instanceof PDFRef) {
+      if (reached.has(object)) continue;
+      reached.add(object);
+      const target = context.lookup(object);
+      if (target) pending.push(target);
+    } else if (object instanceof PDFDict) {
+      pending.push(...object.values());
+    } else if (object instanceof PDFArray) {
+      pending.push(...object.asArray());
+    } else if (object instanceof PDFStream) {
+      pending.push(object.dict);
+    }
+  }
+  for (const [ref] of context.enumerateIndirectObjects()) {
+    if (!reached.has(ref)) context.delete(ref);
+  }
 }

@@ -35,7 +35,8 @@ NDA with no form fields. The skill has the full demo script.
 2. Download `/demo-nda.pdf`. Run `inspect_pdf` and confirm it has no form fields.
 3. Run `find_candidates`, then `render_preview` with `mark_candidates`. Look at every page.
 4. Write the request with anchors: both party names (you fill them with the user's details
-   and the placeholder), and the signature, date and print name (for the human).
+   and the placeholder), and the signature, date and print name of Party A (for the
+   human). Leave the other blanks empty.
 5. Run `validate_request` and fix every error. Run `render_preview` and show the images to
    the user.
 6. Stop. Call `request_signature` only if the user asks to sign.

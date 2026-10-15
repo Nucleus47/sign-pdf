@@ -19,7 +19,7 @@ import { openSignView, SIGNER, watch, WEB_DIR } from './helpers.ts';
  * The SHA-256 of the built demo-nda.pdf. The build is deterministic, so this
  * changes only when the sample NDA or the PDF writer changes. Update it then.
  */
-const DEMO_NDA_SHA256 = 'dab1a58229ea5b4cc9cd632677a0762a2df601ac28c91c0bab8b0099078b9be1';
+const DEMO_NDA_SHA256 = '61399e89c8263dfde18da38d4ef70be776a72675823cf314b479958e4ac7609f';
 
 /** What the user tells the agent. Synthetic: no real name or company. */
 const USER_COMPANY = 'Example Labs LLC';
@@ -58,6 +58,9 @@ interface Candidate {
 test('demo: a scripted agent places and fills fields on the flat NDA, and the human sees the values', async ({ page }) => {
   const pdf = await readFile(join(WEB_DIR, 'demo-nda.pdf'));
   expect(createHash('sha256').update(pdf).digest('hex')).toBe(DEMO_NDA_SHA256);
+  // No trace of the form is left in the file, reachable or not.
+  const bytes = pdf.toString('latin1');
+  for (const name of ['/AcroForm', '/Widget', '/Fields']) expect(bytes, name).not.toContain(name);
 
   // The agent downloads the demo PDF into a private directory.
   const dir = await realpath(await mkdtemp(join(tmpdir(), 'sign-pdf-demo-')));
@@ -140,6 +143,55 @@ test('demo: a scripted agent places and fills fields on the flat NDA, and the hu
       [3, ['date', 'print_name', 'signature']],
     ]);
     expect(preview.content.filter((block) => block.type === 'image')).toHaveLength(2);
+
+    // The filled names are drawn in the preview image: inside each party box,
+    // page 1 differs from a preview of the same boxes with no values. (The tags
+    // above the boxes differ too, as they name the assignee.)
+    const unfilled = {
+      ...request,
+      fields: request.fields.map((field) => (field.assignee === 'agent' ? { ...field, assignee: 'human', value: undefined } : field)),
+    } as SignRequestInput;
+    const [filledPng, unfilledPng] = await Promise.all(
+      [request, unfilled].map(async (each) => {
+        const result = await call('render_preview', { pdf_path: pdfPath, request: each, pages: [1], scale: 2 });
+        const image = result.content.find((block) => block.type === 'image') as { data: string } | undefined;
+        const [layout] = result.structuredContent['images'] as Array<{ page: number; scale: number; origin: { x: number; y: number } }>;
+        expect(layout?.page).toBe(1);
+        return { png: image!.data, layout: layout! };
+      }),
+    );
+    const { scale, origin } = filledPng!.layout;
+    expect(unfilledPng!.layout).toEqual(filledPng!.layout);
+    const boxes = fields
+      .filter((field) => field.rect.page === 1)
+      .map(({ id, rect }) => ({ id, x: origin.x + rect.x * scale, y: origin.y + rect.y * scale, width: rect.width * scale, height: rect.height * scale }));
+    const changed = await page.evaluate(
+      async ({ a, b, boxes }) => {
+        const pixels = async (png: string) => {
+          const bitmap = await createImageBitmap(await (await fetch(`data:image/png;base64,${png}`)).blob());
+          const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+          const context = canvas.getContext('2d')!;
+          context.drawImage(bitmap, 0, 0);
+          return context.getImageData(0, 0, bitmap.width, bitmap.height);
+        };
+        const [one, two] = [await pixels(a), await pixels(b)];
+        const inside = (x: number, y: number) => boxes.find((box) => x > box.x + 2 && x < box.x + box.width - 2 && y > box.y + 2 && y < box.y + box.height - 2);
+        const counts: Record<string, number> = { outside: 0 };
+        for (const box of boxes) counts[box.id] = 0;
+        for (let y = 0; y < one.height; y++) {
+          for (let x = 0; x < one.width; x++) {
+            const i = (y * one.width + x) * 4;
+            if (one.data[i] === two.data[i] && one.data[i + 1] === two.data[i + 1] && one.data[i + 2] === two.data[i + 2]) continue;
+            const box = inside(x, y);
+            counts[box ? box.id : 'outside']!++;
+          }
+        }
+        return counts;
+      },
+      { a: filledPng!.png, b: unfilledPng!.png, boxes },
+    );
+    expect(changed['party_a']).toBeGreaterThan(100);
+    expect(changed['party_b']).toBeGreaterThan(100);
 
     // Step 6: the demo stops here. The test goes on to open the sign view, as
     // it would open if the user asked to sign, and checks the filled names on

@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { cpSync, createReadStream, existsSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { cpSync, createReadStream, existsSync, readFileSync, statSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { dirname, join, normalize, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -102,12 +102,8 @@ function agentSkill(): Plugin {
  */
 function demoNda(): Plugin {
   const source = fileURLToPath(new URL('./public/sample-nda.pdf', import.meta.url));
-  let outDir = 'dist';
   return {
     name: 'sign-pdf:demo-nda',
-    configResolved(config) {
-      outDir = join(config.root, config.build.outDir);
-    },
     configureServer(server) {
       server.middlewares.use('/demo-nda.pdf', (_request, response, next) => {
         flattenForDemo(readFileSync(source)).then((pdf) => {
@@ -116,9 +112,8 @@ function demoNda(): Plugin {
         }, next);
       });
     },
-    async closeBundle() {
-      if (this.meta.watchMode) return;
-      writeFileSync(join(outDir, 'demo-nda.pdf'), await flattenForDemo(readFileSync(source)));
+    async generateBundle() {
+      this.emitFile({ type: 'asset', fileName: 'demo-nda.pdf', source: await flattenForDemo(readFileSync(source)) });
     },
   };
 }

@@ -64,7 +64,7 @@ Use this route when the user asks for a demo. The demo document is a standard mu
 1. Ask the user for their name and company. Use a placeholder, such as "Sample Partner Co.", for the other party.
 2. Download `https://sign.silv.app/demo-nda.pdf` to a local file. Call `inspect_pdf` and confirm that it has no form fields.
 3. Call `find_candidates`, then call `render_preview` with `mark_candidates: true`. Look at every page.
-4. Write the request with anchors. Party A (page 1, the blank after "by and between") gets the user's company. Party B (the blank after `"Party A", and`) gets the placeholder. Assign both to `agent`. Assign the signature, date, and print name of Party A's block on page 3 to `human`; copy their placements from the candidates.
+4. Write the request with anchors. Party A (page 1, the blank after "by and between") gets the user's company. Party B (the blank after `"Party A", and`) gets the placeholder. Assign both to `agent`. Assign the signature, date, and print name of Party A's block on page 3 to `human`; copy their placements from the candidates. Leave the other blanks empty.
 5. Call `validate_request` and fix every error. Call `render_preview` and show the images to the user.
 6. Stop. Call `request_signature` only if the user asks to sign.
 
