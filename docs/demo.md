@@ -8,8 +8,9 @@ the "Demo" section of the [agent skill](../skills/sign-pdf/SKILL.md#demo) and in
 ## The demo document
 
 `/demo-nda.pdf` is made at build time from `packages/web/public/sample-nda.pdf`: a Vite
-plugin (`packages/web/demoNda.ts`) removes the form (AcroForm) fields, their widgets and every object left unused, and
-writes the result into the web build. The repository holds no second PDF.
+plugin (`packages/web/demoNda.ts`) removes the form (AcroForm) fields, their widgets and
+every object left unused, and writes the result into the web build. The repository holds
+no second PDF.
 
 The output is deterministic, so its SHA-256 is stable from build to build. The
 [end-to-end test](../e2e/demo.spec.ts) pins it. When the sample or the PDF writer changes,

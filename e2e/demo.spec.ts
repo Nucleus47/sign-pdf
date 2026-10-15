@@ -176,20 +176,21 @@ test('demo: a scripted agent places and fills fields on the flat NDA, and the hu
         };
         const [one, two] = [await pixels(a), await pixels(b)];
         const inside = (x: number, y: number) => boxes.find((box) => x > box.x + 2 && x < box.x + box.width - 2 && y > box.y + 2 && y < box.y + box.height - 2);
-        const counts: Record<string, number> = { outside: 0 };
+        const counts: Record<string, number> = {};
         for (const box of boxes) counts[box.id] = 0;
         for (let y = 0; y < one.height; y++) {
           for (let x = 0; x < one.width; x++) {
             const i = (y * one.width + x) * 4;
             if (one.data[i] === two.data[i] && one.data[i + 1] === two.data[i + 1] && one.data[i + 2] === two.data[i + 2]) continue;
             const box = inside(x, y);
-            counts[box ? box.id : 'outside']!++;
+            if (box) counts[box.id]!++;
           }
         }
         return counts;
       },
       { a: filledPng!.png, b: unfilledPng!.png, boxes },
     );
+    // A name at scale 2 inks thousands of pixels; 100 rules out only noise.
     expect(changed['party_a']).toBeGreaterThan(100);
     expect(changed['party_b']).toBeGreaterThan(100);
 
