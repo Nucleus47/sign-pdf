@@ -1,6 +1,7 @@
 {
   "title": "Mutual NDA (demo)",
   "note": "This is a demo with demo values. It is not a real agreement. The PDF stays on this device.",
+  "signer": { "name": "Your Name" },
   "fields": [
     {
       "id": "party_a",
@@ -36,7 +37,7 @@
       "id": "print_name",
       "type": "text",
       "label": "Print name",
-      "assignee": "human",
+      "assignee": "agent",
       "value": "Your Name",
       "placement": { "kind": "anchor", "text": "Print Name", "page": 3, "occurrence": 1, "align": "right", "dx": 6.4, "dy": -1, "width": 166.4, "height": 14 }
     }

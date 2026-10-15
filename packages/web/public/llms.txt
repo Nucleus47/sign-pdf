@@ -41,11 +41,12 @@ on the other blanks. The skill has the full demo script.
    another signer stores an encrypted copy on the relay, for up to 7 days (the signed copy
    up to 5 days), and the relay does not keep the key; the demo does not use it.
 2. Ask the user: "Can I put your name and company on the demo NDA?" On yes, use the user's
-   company for Party A and the user's name for Print name. On no, use the demo values
-   "Example Co." and "Your Name". Party B is always "Sample Partner Co.". Put no other real
+   company for Party A and the user's name for Print name and the signer name. On no, use
+   the demo values "Example Co." and "Your Name". Party B is always "Sample Partner Co.". Put no other real
    information on the form.
 3. The ready request is https://sign.silv.app/demo-request.json: the five fields with plain
-   labels and the demo values. Change `party_a` and `print_name` only after a yes.
+   labels and the demo values. Change `party_a`, `print_name` and
+   `signer.name` only after a yes.
    - MCP route: download `/demo-nda.pdf`, run `inspect_pdf` (no form fields),
      `find_candidates` and `render_preview` with `mark_candidates`. Add `version` and
      `document` (name and `sha256`) to the request. Run `validate_request`, then

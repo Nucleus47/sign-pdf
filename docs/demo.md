@@ -40,6 +40,11 @@ print name of Party A on page 3. Each has printed text to anchor on, so no field
 stay empty on purpose. The labels are plain names (Party A, Party B, Signature, Date,
 Print name), and the sign view shows no label inside an empty box.
 
+The agent fills the print name, and the request names the signer (`signer.name`) with the
+same value, so the sign view does not ask for the name twice. The signer has two steps:
+the signature and the confirmation checkbox ("0 of 2 required items"). The date is today's.
+While the request loads, the field list says "Loading the fields…", not "No fields yet".
+
 ## The check in CI
 
 `e2e/demo.spec.ts` drives the real MCP server in memory as a scripted agent with no model,

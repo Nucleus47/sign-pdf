@@ -96,10 +96,15 @@ export function Prepare({ document: doc, state, dispatch, onContinue, initialReq
   const initialTried = useRef(false);
   /** A link's request opens the paste box, so its result is in view. */
   const [pasteOpen] = useState(initialRequest !== undefined && !demo);
+  /** The initial request is still being put on the page: the field list says so, not "No fields yet". */
+  const [loadingFields, setLoadingFields] = useState(initialRequest !== undefined);
   useEffect(() => {
     if (initialRequest === undefined || initialTried.current) return;
     initialTried.current = true;
-    void agent.apply_request({ request: initialRequest }).then(showResult);
+    void agent
+      .apply_request({ request: initialRequest })
+      .then(showResult)
+      .finally(() => setLoadingFields(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once per link request; showResult reads current props
   }, [agent, initialRequest]);
   const acroUsable = useMemo(() => usableAcroFields(doc.inspection.acroFields), [doc.inspection.acroFields]);
@@ -445,8 +450,8 @@ export function Prepare({ document: doc, state, dispatch, onContinue, initialReq
           {demo && (
             <div className="notice demo-notice" data-testid="demo-notice">
               <p>
-                <strong>Demo.</strong> This sample NDA has five fields with demo values. Party A and Party B
-                are filled in. You sign, date and print your name.
+                <strong>Demo.</strong> This sample NDA has five fields with demo values. Party A, Party B,
+                the date and your name are filled in. You sign and confirm.
               </p>
               <p>The PDF and what you type stay in this browser. Nothing is uploaded.</p>
             </div>
@@ -505,7 +510,11 @@ export function Prepare({ document: doc, state, dispatch, onContinue, initialReq
           <h2 id={`${helpId}-list`}>
             Fields <span className="count" data-testid="field-count">{state.fields.length}</span>
           </h2>
-          {state.fields.length === 0 ? (
+          {state.fields.length === 0 && loadingFields ? (
+            <p className="empty" role="status" data-testid="fields-loading">
+              Loading the fields…
+            </p>
+          ) : state.fields.length === 0 ? (
             <p className="empty" data-testid="no-fields">
               No fields yet. Add the first one above.
             </p>
