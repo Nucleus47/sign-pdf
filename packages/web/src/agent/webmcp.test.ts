@@ -1,4 +1,4 @@
-import { BROWSER_TOOLS } from '@sign-pdf/core/tools';
+import { BROWSER_TOOLS, BROWSER_TOOL_RULE, BROWSER_WORKFLOW } from '@sign-pdf/core/tools';
 import { describe, expect, it, vi } from 'vitest';
 import type { AgentApi } from './api.ts';
 import { findModelContext, registerWebMcpTools, toWebMcpResult, type ModelContextLike } from './webmcp.ts';
@@ -44,8 +44,12 @@ describe('registerWebMcpTools', () => {
     expect(preview?.inputSchema).toMatchObject({ type: 'object', properties: { mark_candidates: { type: 'boolean' } } });
     expect(preview?.annotations).toEqual({ readOnlyHint: true, untrustedContentHint: true });
     expect(tools.get('apply_request')?.annotations.readOnlyHint).toBe(false);
-    // No tool can sign: nothing in the catalog is named for it.
+    // No tool can sign: nothing in the catalog is named for it, and every description states the rule and points to /skill.md.
     expect([...tools.keys()].some((name) => /sign(?!_)|consent|initial/.test(name))).toBe(false);
+    for (const tool of tools.values()) {
+      expect(tool.description).toContain(BROWSER_TOOL_RULE);
+    }
+    expect(BROWSER_WORKFLOW).toContain(BROWSER_TOOL_RULE);
     unregister();
     expect(tools.size).toBe(0);
   });

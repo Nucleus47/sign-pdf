@@ -87,7 +87,7 @@ Tell the user this before you ask for their name, or in the same message as the 
 
 ### Browser route
 
-Use this route when you have a browser but no MCP server.
+Never sign, draw or type a signature for the user, and never tick the consent box. Use this route when you have a browser but no MCP server.
 
 1. Open https://sign.silv.app and press "Try the sample agreement". The demo NDA opens with the five fields and the demo values on the page.
 2. If the user said yes, download https://sign.silv.app/demo-request.json, change the values of `party_a`, `print_name` and `signer.name`, and apply it: call `apply_request` (WebMCP or `window.signPdf`), or open "Paste a request from an agent", paste the JSON and press "Apply request". The request replaces the fields on the page.
@@ -107,7 +107,7 @@ Do not call `request_signature` or `get_signature_status` on this route. The pac
 
 ## Use the website with only a browser
 
-Use this route when you have a browser but no MCP server. When the MCP server is available, follow the tool order above instead.
+Never sign, draw or type a signature for the user, and never tick the consent box. Use this route when you have a browser but no MCP server. When the MCP server is available, follow the tool order above instead.
 
 1. Open https://sign.silv.app and open the PDF in the prepare view. Ask the human to open it when you cannot pick a file.
 2. Use the first route that works:

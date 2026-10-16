@@ -240,6 +240,8 @@ describe('the home page', () => {
     // One input for what was received: a hand-off PDF or a packet.
     const received = screen.getByTestId('open-packet-input');
     expect(received.getAttribute('accept')).toBe('.pdf,.json,application/pdf,application/json');
+    expect(screen.getByTestId('home-agent-hint')).toHaveTextContent('AI agent? Read /skill.md first.');
+    expect(screen.getByTestId('skill-link')).toHaveAttribute('href', '/skill.md');
     expect(screen.getByTestId('home-agent')).toHaveTextContent('opens the document in your browser; you sign.');
     expect(screen.getByTestId('agent-link')).toHaveTextContent('llms.txt');
     expect(screen.getByTestId('home-open-source')).toHaveTextContent('Open source under the MIT license.');

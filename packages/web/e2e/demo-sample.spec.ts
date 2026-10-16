@@ -16,6 +16,9 @@ test('the sample opens the demo: five plain fields, two steps for the signer, an
     }).observe(document, { childList: true, subtree: true });
   });
   await page.goto('/');
+  await expect(page.getByTestId('home-agent-hint')).toBeVisible();
+  await expect(page.getByTestId('home-agent-hint')).toHaveText('AI agent? Read /skill.md first.');
+  await expect(page.getByTestId('skill-link')).toHaveAttribute('href', '/skill.md');
   await page.getByTestId('load-sample').click();
   await expect(page.getByTestId('app-root')).toHaveAttribute('data-state', 'preparing');
   await expect(page.getByTestId('document-name')).toHaveText('demo-nda.pdf');
@@ -52,6 +55,10 @@ test('the sample opens the demo: five plain fields, two steps for the signer, an
   await expect(page.getByTestId('done-date')).toBeVisible();
   await expect(page.getByTestId('signer-name')).toHaveValue('Your Name');
   await expect(page.getByTestId('progress-text')).toHaveText('0 of 2 required items done');
+  await expect(page.getByTestId('sign-agent-guard')).toBeVisible();
+  await expect(page.getByTestId('sign-agent-guard')).toHaveText(
+    'Only the person who signs can press Sign. An AI agent must stop here and ask its user.',
+  );
   await expect(page.getByTestId('sign-button')).toBeDisabled();
   await expect(page.getByTestId('field-box-party_a')).toContainText('Example Co.');
   await expect(page.getByTestId('field-box-party_b')).toContainText('Sample Partner Co.');
