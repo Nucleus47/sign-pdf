@@ -13,6 +13,8 @@ Small, single-topic pages. Add each new page to this index.
 - [Hand-off PDF](handoff-pdf.md): the PDF that carries a document to the next signer on another device: what it shows, what it carries, and its warnings.
 - [Relay](relay.md): the optional server that emails the next signer an encrypted copy: the flow, the API, what the server can see, lifetimes and operator setup.
 
+- [Demo screen checks](ui/README.md): screen states, viewport sizes and capture setup for the sample flow.
+
 ## Elsewhere in the repository
 
 - [README](../README.md): what sign-pdf is and how to develop it.

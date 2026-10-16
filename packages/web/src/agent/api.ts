@@ -205,7 +205,7 @@ export function createAgentApi(ctx: AgentContext): AgentApi {
         warnings,
         ready: left.length === 0,
         next:
-          'The fields are on the page. Ask the human to review them and press "Continue to sign", or call download_packet to save a packet for the signer. ' +
+          'The fields are on the page. Press "Continue to sign" to open the sign view, then stop and ask the human to review and sign, or call download_packet to save a packet for the signer. ' +
           'Only the human signs: do not operate the sign view.',
       };
     },

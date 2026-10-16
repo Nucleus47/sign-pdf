@@ -4,6 +4,7 @@
  * form panel, and the form panel is ordinary labelled HTML.
  */
 import { useEffect, useId, useMemo, useRef, useState, type Dispatch, type FocusEvent as ReactFocusEvent, type KeyboardEvent as ReactKeyboardEvent } from 'react';
+import { createPortal } from 'react-dom';
 import { isSigningField, type FieldType, type PageInfo, type Rect, type SignRequestInput } from '@sign-pdf/spec';
 import type { AgentResult } from '../agent/api.ts';
 import { useAgentApi } from '../agent/expose.ts';
@@ -32,7 +33,7 @@ import {
   type PrepareAction,
   type PrepareState,
 } from '../lib/fields.ts';
-import { showFieldBox, visiblePage } from '../lib/dom.ts';
+import { APP_BAR_SLOT_ID, showFieldBox, visiblePage } from '../lib/dom.ts';
 import { savePacketFile, saveRequestFile } from '../lib/exports.ts';
 import { clampRect, DEFAULT_FIELD_SIZE, defaultRectAt, growRect, moveRect, type PagePoint } from '../lib/geometry.ts';
 import {
@@ -359,9 +360,27 @@ export function Prepare({ document: doc, state, dispatch, onContinue, initialReq
   };
 
   const ready = issues.length === 0;
+  const canContinue = state.fields.length > 0 && ready;
+  const [barSlot, setBarSlot] = useState<HTMLElement | null>(null);
+  useEffect(() => setBarSlot(document.getElementById(APP_BAR_SLOT_ID)), []);
+  const barControl =
+    canContinue && barSlot
+      ? createPortal(
+          <button
+            type="button"
+            className="button primary app-bar-cta"
+            data-testid="app-bar-sign"
+            onClick={() => onContinue(request())}
+          >
+            Continue to sign →
+          </button>,
+          barSlot,
+        )
+      : null;
 
   return (
     <main className="workspace" id="main" data-view="prepare">
+      {barControl}
       <PdfViewer
         pdf={doc.bytes}
         label={`Document: ${displayText(doc.name)}`}
@@ -453,8 +472,19 @@ export function Prepare({ document: doc, state, dispatch, onContinue, initialReq
                 <strong>Demo.</strong> This sample NDA has five fields with demo values. Party A, Party B,
                 the date and your name are filled in. You sign and confirm.
               </p>
+              <p className={UNTRUSTED_TEXT_CLASS}>{displayText(state.details.note)}</p>
               <p>The PDF and what you type stay in this browser. Nothing is uploaded.</p>
             </div>
+          )}
+          {canContinue && (
+            <button
+              type="button"
+              className="button primary"
+              data-testid="header-continue-to-sign"
+              onClick={() => onContinue(request())}
+            >
+              Continue to sign
+            </button>
           )}
           <p className="hint">
             Pick a field type above the page and click where it goes, or add it with the form below.

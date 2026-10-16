@@ -1,0 +1,1 @@
+{"viewports":{"desktop":{"width":1440,"height":900},"mobile":{"width":390,"height":844}},"templates":[{"id":"prepare","title":"Demo fields and blank disclosure","path":"/","ready":"[data-testid=demo-notice]"},{"id":"sign","title":"Human signing and edit fields","path":"/","ready":"[data-testid=app-bar-prepare]"}]}

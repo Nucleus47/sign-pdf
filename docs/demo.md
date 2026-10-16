@@ -10,7 +10,7 @@ NDA that has no form fields. The steps for the agent are in the "Demo" section o
   stores an encrypted copy, for a limited time ([relay](relay.md#state-and-lifetimes)).
 - Then it asks before it puts the user's name and company on the NDA. Without a yes, it
   uses demo values ("Example Co.", "Your Name"). Party B is always "Sample Partner Co.".
-- The agent shows the filled preview and asks before it requests a signature.
+- The agent scans every page, discloses every skipped blank before the preview, and reports the full blank inventory with it. It asks before it requests a signature.
 
 There are two routes: the MCP server, and the browser only. Both use the same request,
 `/demo-request.json` (`packages/web/public/demo-request.json`). It has no `version` or
@@ -19,8 +19,9 @@ There are two routes: the MCP server, and the browser only. Both use the same re
 ## The sample on the start page
 
 "Try the sample agreement" opens the same demo: `/demo-nda.pdf` in the prepare view, with
-the fields of `/demo-request.json` on the page and a note that it is a demo and that
-nothing is uploaded (`openSample` in `packages/web/src/app/open.ts`). The
+the fields of `/demo-request.json` on the page, "Continue to sign" in the top bar and panel
+header, and a note that it is a demo and that nothing is uploaded (`openSample` in
+`packages/web/src/app/open.ts`). The
 [sample check](../packages/web/e2e/demo-sample.spec.ts) opens it from the start page.
 
 ## The demo document
@@ -36,8 +37,14 @@ update the pinned value.
 
 The demo fills five blanks: the two party names on page 1, and the signature, date and
 print name of Party A on page 3. Each has printed text to anchor on, so no field needs a
-`rect` placement. The other blanks (the effective date, the terms, and Party B's block)
-stay empty on purpose. The labels are plain names (Party A, Party B, Signature, Date,
+`rect` placement. The six other logical blanks stay empty on purpose: Effective Date (page 1), confidentiality
+period (page 1, clause 2), agreement duration (page 2, clause 9), and Party B's signature,
+date and print name (page 3). The Effective Date has three underscore runs (day, month,
+year stub), which count as one logical date even when detection splits them. There are
+13 underscore runs and 11 logical blanks in total. The skill, ready request note and
+sample notice list the skipped blanks. The agent must disclose them before showing the
+preview and include the [full inventory](../skills/sign-pdf/SKILL.md#account-for-all-demo-blanks)
+with it. The labels are plain names (Party A, Party B, Signature, Date,
 Print name), and the sign view shows no label inside an empty box.
 
 The agent fills the print name, and the request names the signer (`signer.name`) with the

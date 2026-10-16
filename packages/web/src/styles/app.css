@@ -182,6 +182,22 @@ code {
   background: rgb(255 255 255 / 0.12);
 }
 
+.app-bar .app-bar-cta {
+  min-height: 2.25rem;
+  padding: var(--space-1) var(--space-3);
+  border-color: var(--color-flag);
+  background: var(--color-flag);
+  color: var(--color-flag-ink);
+  font-size: var(--text-s);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.app-bar .app-bar-cta:hover:not(:disabled) {
+  border-color: var(--color-surface);
+  background: var(--color-flag);
+}
+
 /* Text that came with a document or a request (see lib/displayText.ts): its
    direction never leaks into, or is taken from, the app's own words. */
 .untrusted-text,

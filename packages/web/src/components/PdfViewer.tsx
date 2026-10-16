@@ -61,6 +61,7 @@ type LoadState =
 export function PdfViewer({ pdf, label, renderOverlay, onPages, toolbar, regionProps, focus }: PdfViewerProps) {
   const [load, setLoad] = useState<LoadState>({ status: 'loading' });
   const [zoom, setZoom] = useState<number | null>(null);
+  const userZoomed = useRef(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [centerOn, setCenterOn] = useState<{ rect: Rect; seq: number } | null>(null);
   const centered = useRef<number | null>(null);
@@ -72,6 +73,7 @@ export function PdfViewer({ pdf, label, renderOverlay, onPages, toolbar, regionP
     let opened: PDFDocumentProxy | undefined;
     setLoad({ status: 'loading' });
     setZoom(null);
+    userZoomed.current = false;
     (async () => {
       try {
         const doc = await openPdf(pdf);
@@ -123,6 +125,25 @@ export function PdfViewer({ pdf, label, renderOverlay, onPages, toolbar, regionP
     // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once per document
   }, [firstWidth]);
 
+  // Keep the page fitted when an embedded browser pane resizes, until the person zooms manually.
+  useEffect(() => {
+    const scroller = scrollRef.current;
+    if (!scroller || firstWidth === null || typeof ResizeObserver === 'undefined') return;
+    let lastWidth = scroller.clientWidth;
+    const observer = new ResizeObserver(() => {
+      const width = scroller.clientWidth;
+      if (width <= 0 || width === lastWidth) return;
+      lastWidth = width;
+      if (!userZoomed.current) {
+        const next = Math.min(fitWidthZoom(firstWidth, width - PAGE_GUTTER_PX), 1.5);
+        zoomRef.current = next;
+        setZoom(next);
+      }
+    });
+    observer.observe(scroller);
+    return () => observer.disconnect();
+  }, [firstWidth]);
+
   const scale = zoom ?? 1;
   const ready = load.status === 'ready' && zoom !== null;
   const zoomRef = useRef(scale);
@@ -132,7 +153,11 @@ export function PdfViewer({ pdf, label, renderOverlay, onPages, toolbar, regionP
   useEffect(() => {
     if (!focus || !ready) return;
     const available = (scrollRef.current?.clientWidth ?? 800) - PAGE_GUTTER_PX;
-    setZoom((current) => fieldZoom(current ?? 1, focus.rect.width, available));
+    setZoom((current) => {
+      const next = fieldZoom(current ?? 1, focus.rect.width, available);
+      if (next !== (current ?? 1)) userZoomed.current = true;
+      return next;
+    });
     setCenterOn({ rect: focus.rect, seq: focus.seq });
     // eslint-disable-next-line react-hooks/exhaustive-deps -- a new request is a new seq
   }, [focus?.seq, ready]);
@@ -178,6 +203,7 @@ export function PdfViewer({ pdf, label, renderOverlay, onPages, toolbar, regionP
       const next = pinchZoom(pinch.zoom, pinch.distance, spread(event.touches));
       const current = zoomRef.current;
       if (next === current) return;
+      userZoomed.current = true;
       const point = middle(event.touches);
       const ratio = next / current;
       const left = (scroller.scrollLeft + point.x) * ratio - point.x;
@@ -211,7 +237,10 @@ export function PdfViewer({ pdf, label, renderOverlay, onPages, toolbar, regionP
             data-testid="zoom-out"
             aria-label="Zoom out"
             disabled={scale <= ZOOM_MIN}
-            onClick={() => setZoom(stepZoom(scale, -1))}
+            onClick={() => {
+              userZoomed.current = true;
+              setZoom(stepZoom(scale, -1));
+            }}
           >
             <span aria-hidden="true">−</span>
           </button>
@@ -224,11 +253,22 @@ export function PdfViewer({ pdf, label, renderOverlay, onPages, toolbar, regionP
             data-testid="zoom-in"
             aria-label="Zoom in"
             disabled={scale >= ZOOM_MAX}
-            onClick={() => setZoom(stepZoom(scale, 1))}
+            onClick={() => {
+              userZoomed.current = true;
+              setZoom(stepZoom(scale, 1));
+            }}
           >
             <span aria-hidden="true">+</span>
           </button>
-          <button type="button" className="button quiet" data-testid="zoom-fit" onClick={() => setZoom(fit())}>
+          <button
+            type="button"
+            className="button quiet"
+            data-testid="zoom-fit"
+            onClick={() => {
+              userZoomed.current = false;
+              setZoom(fit());
+            }}
+          >
             Fit width
           </button>
         </div>

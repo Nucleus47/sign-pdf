@@ -22,7 +22,15 @@ test('the sample opens the demo: five plain fields, two steps for the signer, an
   await page.getByTestId('load-sample').click();
   await expect(page.getByTestId('app-root')).toHaveAttribute('data-state', 'preparing');
   await expect(page.getByTestId('document-name')).toHaveText('demo-nda.pdf');
-  await expect(page.getByTestId('field-count')).toHaveText('5');
+  const ready = await (await page.request.get('/demo-request.json')).json();
+  await expect(page.getByTestId('field-count')).toHaveText(String(ready.fields.length));
+  expect(ready.fields.map((field: { id: string }) => field.id).sort()).toEqual([
+    'date', 'party_a', 'party_b', 'print_name', 'signature',
+  ]);
+  for (const blank of ['Effective Date', 'confidentiality', 'agreement duration', 'Party B’s']) {
+    await expect(page.getByTestId('demo-notice')).toContainText(blank);
+    expect(ready.note).toContain(blank);
+  }
   await expect(page.getByTestId('demo-notice')).toContainText('Nothing is uploaded');
   // The demo PDF has no form fields, so no other blank is offered as a field.
   await expect(page.getByTestId('use-acro-fields')).toHaveCount(0);
@@ -31,8 +39,11 @@ test('the sample opens the demo: five plain fields, two steps for the signer, an
   // The field list never said "No fields yet" while the demo request loaded.
   expect(await page.evaluate(() => (window as unknown as { sawNoFields?: boolean }).sawNoFields ?? false)).toBe(false);
 
-  await page.getByTestId('continue-to-sign').click();
+  await expect(page.getByTestId('app-bar-sign')).toBeVisible();
+  await expect(page.getByTestId('header-continue-to-sign')).toBeVisible();
+  await page.getByTestId('app-bar-sign').click();
   await expect(page.getByTestId('app-root')).toHaveAttribute('data-state', 'awaiting-human');
+  await expect(page.getByTestId('app-bar-prepare')).toBeVisible();
   await showAllFields(page);
 
   const labels: Record<string, string> = {
@@ -79,4 +90,24 @@ test('the sample opens the demo: five plain fields, two steps for the signer, an
 
   expectOnlyOwnStaticAssets(seen, baseURL!);
   expect(seen.problems).toEqual([]);
+});
+
+test('sample fit follows pane width until the person chooses a zoom', async ({ page }) => {
+  await page.setViewportSize({ width: 1100, height: 900 });
+  await page.goto('/');
+  await page.getByTestId('load-sample').click();
+  await expect(page.getByTestId('field-box-party_a')).toBeVisible();
+  const zoom = page.getByTestId('zoom-value');
+  const initial = await zoom.textContent();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(zoom).not.toHaveText(initial!);
+  await page.getByTestId('zoom-in').click();
+  const manual = await zoom.textContent();
+  await page.setViewportSize({ width: 1100, height: 900 });
+  await expect(zoom).toHaveText(manual!);
+  await page.getByTestId('zoom-fit').click();
+  await expect(zoom).not.toHaveText(manual!);
+  const fitted = await zoom.textContent();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(zoom).not.toHaveText(fitted!);
 });
