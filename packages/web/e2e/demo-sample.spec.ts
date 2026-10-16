@@ -3,10 +3,10 @@ import { drawSignature, expectOnlyOwnStaticAssets, showAllFields, watch } from '
 
 /**
  * "Try the sample agreement" opens the agent demo (docs/demo.md): the NDA with
- * no form fields and the five demo fields of /demo-request.json, with plain
+ * no form fields and the six demo fields of /demo-request.json, with plain
  * labels and demo values. The sign view keeps empty boxes empty.
  */
-test('the sample opens the demo: five plain fields, two steps for the signer, and no label inside an empty box', async ({ page, baseURL }) => {
+test('the sample opens the demo: six plain fields, two steps for the signer, and no label inside an empty box', async ({ page, baseURL }) => {
   const seen = watch(page);
   // Record whether the empty field list ever shows while the sample loads (#16).
   await page.addInitScript(() => {
@@ -25,9 +25,10 @@ test('the sample opens the demo: five plain fields, two steps for the signer, an
   const ready = await (await page.request.get('/demo-request.json')).json();
   await expect(page.getByTestId('field-count')).toHaveText(String(ready.fields.length));
   expect(ready.fields.map((field: { id: string }) => field.id).sort()).toEqual([
-    'date', 'party_a', 'party_b', 'print_name', 'signature',
+    'date', 'effective_date', 'party_a', 'party_b', 'print_name', 'signature',
   ]);
-  for (const blank of ['Effective Date', 'confidentiality', 'agreement duration', 'Party B’s']) {
+  // The Effective Date is now a real field, so only the truly skipped blanks show in the note.
+  for (const blank of ['confidentiality', 'agreement duration', 'Party B’s']) {
     await expect(page.getByTestId('demo-notice')).toContainText(blank);
     expect(ready.note).toContain(blank);
   }
@@ -47,6 +48,7 @@ test('the sample opens the demo: five plain fields, two steps for the signer, an
   await showAllFields(page);
 
   const labels: Record<string, string> = {
+    effective_date: 'Effective date',
     party_a: 'Party A',
     party_b: 'Party B',
     signature: 'Signature',
@@ -57,8 +59,9 @@ test('the sample opens the demo: five plain fields, two steps for the signer, an
     await expect(page.getByTestId(`review-row-${id}`).locator('.review-label, label').first()).toContainText(label);
   }
   // The agent filled the two party names, the print name and the signer name
-  // with demo values; the date is today's. The signer has two things to do:
-  // sign, and tick the confirmation box. No name is asked twice (#16).
+  // with demo values; both dates default to today's. The signer has two things
+  // to do: sign, and tick the confirmation box. No name is asked twice (#16).
+  await expect(page.getByTestId('done-effective_date')).toBeVisible();
   await expect(page.getByTestId('prefilled-party_a')).toBeVisible();
   await expect(page.getByTestId('prefilled-party_b')).toBeVisible();
   await expect(page.getByTestId('prefilled-print_name')).toBeVisible();
@@ -71,6 +74,7 @@ test('the sample opens the demo: five plain fields, two steps for the signer, an
     'Only the person who signs can press Sign. An AI agent must stop here and ask its user.',
   );
   await expect(page.getByTestId('sign-button')).toBeDisabled();
+  await expect(page.getByTestId('field-box-effective_date')).toContainText(/^\d{4}-\d{2}-\d{2}/);
   await expect(page.getByTestId('field-box-party_a')).toContainText('Example Co.');
   await expect(page.getByTestId('field-box-party_b')).toContainText('Sample Partner Co.');
 

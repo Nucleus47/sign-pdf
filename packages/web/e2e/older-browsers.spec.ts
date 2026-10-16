@@ -114,7 +114,7 @@ test('opens a PDF in a browser without the features Safari 16.4 lacks', async ({
   await expect(page.getByTestId('app-root')).toHaveAttribute('data-view', 'prepare');
   await expect(page.locator('[data-page] canvas').first()).toBeVisible();
   // The sample's demo fields are anchored on the page text, so they resolve only when the text can be read.
-  await expect(page.getByTestId('field-count')).toHaveText('5');
+  await expect(page.getByTestId('field-count')).toHaveText('6');
   // Reading the page text is what failed on an older iPhone: the text layer and candidates use it.
   await expect(page.locator('.textLayer span').first()).toBeAttached();
   expect(errors).toEqual([]);

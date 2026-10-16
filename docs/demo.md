@@ -35,21 +35,21 @@ The output is deterministic, so its SHA-256 is stable from build to build. The
 [end-to-end test](../e2e/demo.spec.ts) pins it. When the sample or the PDF writer changes,
 update the pinned value.
 
-The demo fills five blanks: the two party names on page 1, and the signature, date and
-print name of Party A on page 3. Each has printed text to anchor on, so no field needs a
-`rect` placement. The six other logical blanks stay empty on purpose: Effective Date (page 1), confidentiality
-period (page 1, clause 2), agreement duration (page 2, clause 9), and Party B's signature,
-date and print name (page 3). The Effective Date has three underscore runs (day, month,
-year stub), which count as one logical date even when detection splits them. There are
-13 underscore runs and 11 logical blanks in total. The skill, ready request note and
-sample notice list the skipped blanks. The agent must disclose them before showing the
-preview and include the [full inventory](../skills/sign-pdf/SKILL.md#account-for-all-demo-blanks)
-with it. The labels are plain names (Party A, Party B, Signature, Date,
-Print name), and the sign view shows no label inside an empty box.
+The demo fills six blanks: the effective date and the two party names on page 1, and the
+signature, date and print name of Party A on page 3. The split effective date line
+(`"___ day of _____________________, 20___"`) is detected as one `date` candidate anchored
+on `"day of"`, and each field has printed text to anchor on, so no field needs a `rect`
+placement. The other five blanks stay empty on purpose: the confidentiality period
+(page 1, clause 2), the agreement duration (page 2, clause 9), and Party B's signature,
+date and print name (page 3). The labels are plain names (Effective date, Party A, Party B,
+Signature, Date, Print name), and the sign view shows no label inside an empty box. The
+agent must disclose the skipped blanks before showing the preview and include the
+[full inventory](../skills/sign-pdf/SKILL.md#account-for-all-demo-blanks) with it.
 
 The agent fills the print name, and the request names the signer (`signer.name`) with the
 same value, so the sign view does not ask for the name twice. The signer has two steps:
-the signature and the confirmation checkbox ("0 of 2 required items"). The date is today's.
+the signature and the confirmation checkbox ("0 of 2 required items"). Both dates default to
+today's.
 While the request loads, the field list says "Loading the fields…", not "No fields yet".
 
 ## The check in CI

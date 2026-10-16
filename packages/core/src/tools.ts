@@ -92,6 +92,7 @@ export const SHARED_TOOLS = {
     title: 'Find placement candidates',
     description:
       'List the likely places for fields on a PDF, numbered in reading order: labels ending in ":" (such as "Signature:"), underscore lines, drawn lines next to a signature, initials or date label, and existing form fields. ' +
+      'Scan every page for underscore blanks and form fields, and account for each blank as agent-filled, human-assigned, or intentionally left blank. A split prose date line ("___ day of ___, 20__") is one date candidate anchored on "day of". ' +
       'Each candidate has its kind, page and rectangle, a suggested placement to copy into a request field, and a suggested field type when the label makes it obvious. Then validate_request and render_preview. ' +
       'render_preview with mark_candidates draws candidate n as C<n>. ' +
       'Image-only pages have no usable anchors or candidates; the result gives a warning with the preview-to-rect fallback. ' +
@@ -129,6 +130,7 @@ export const SHARED_TOOLS = {
       'Render the pages that have fields as PNG images with every field box, its id and its type drawn on them, plus the resolved rectangles. Candidates of an ambiguous anchor are dashed outlines labelled "<field id> #n" (n = occurrence). ' +
       'With mark_candidates, each placement candidate of find_candidates is a dotted dark outline tagged "C<n>", and the request is optional. ' +
       'ALWAYS call this and look at the images before the human sees the request: check that each box sits on the blank it is meant for and does not cover printed text. ' +
+      'Report the complete blank list (filled, human-assigned, and intentionally left blank) when showing the preview to the human. ' +
       'Rulers along the top and left edges are labelled in points and a light grid marks every 50 points, so you can read off a correction; ' +
       'a point (x, y) is at pixel (origin.x + x * scale, origin.y + y * scale). Nothing is shown to the human.',
     input: {

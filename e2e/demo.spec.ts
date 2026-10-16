@@ -31,6 +31,7 @@ const OTHER_PARTY = 'Sample Partner Co.';
  * the sample NDA). Party A's block on page 3 is the user's.
  */
 const EXPECTED: Record<string, Rect> = {
+  effective_date: { page: 1, x: 366.6, y: 74, width: 119, height: 12 },
   party_a: { page: 1, x: 282.8, y: 94.8, width: 119.6, height: 12 },
   party_b: { page: 1, x: 157, y: 115.3, width: 119, height: 12 },
   signature: { page: 3, x: 185.8, y: 102.5, width: 173.9, height: 12 },
@@ -100,10 +101,10 @@ test('demo: a scripted agent places and fills fields on the flat NDA, and the hu
     expect(marked.content.filter((block) => block.type === 'image')).toHaveLength(3);
 
     // Step 4: the request. The party names are on text anchors the agent writes;
-    // the human's fields copy the candidates of Party A's block.
-    const pick = (text: string, type: string) => {
-      const candidate = candidates.find((item) => item.page === 3 && item.text === text && item.suggested.type === type);
-      expect(candidate, `a ${type} candidate for "${text}"`).toBeDefined();
+    // the effective date on page 1 and Party A's block on page 3 copy their candidates.
+    const pick = (pageNumber: number, text: string, type: string) => {
+      const candidate = candidates.find((item) => item.page === pageNumber && item.text === text && item.suggested.type === type);
+      expect(candidate, `a ${type} candidate for "${text}" on page ${pageNumber}`).toBeDefined();
       return candidate!.suggested.placement;
     };
     const request: SignRequestInput = {
@@ -112,6 +113,7 @@ test('demo: a scripted agent places and fills fields on the flat NDA, and the hu
       title: 'Mutual NDA (demo)',
       signer: { name: SIGNER },
       fields: [
+        { id: 'effective_date', type: 'date', label: 'Effective date', assignee: 'human', placement: pick(1, 'day of', 'date') },
         {
           id: 'party_a',
           type: 'text',
@@ -128,9 +130,9 @@ test('demo: a scripted agent places and fills fields on the flat NDA, and the hu
           value: OTHER_PARTY,
           placement: { kind: 'anchor', text: '"Party A", and', page: 1, align: 'right', dx: 5.5, dy: -1, width: 119, height: 14 },
         },
-        { id: 'signature', type: 'signature', label: 'Signature', assignee: 'human', placement: pick('Party A’s Signature', 'signature') },
-        { id: 'date', type: 'date', label: 'Date', assignee: 'human', placement: pick('Date', 'date') },
-        { id: 'print_name', type: 'text', label: 'Print name', assignee: 'agent', value: SIGNER, placement: pick('Print Name', 'text') },
+        { id: 'signature', type: 'signature', label: 'Signature', assignee: 'human', placement: pick(3, 'Party A’s Signature', 'signature') },
+        { id: 'date', type: 'date', label: 'Date', assignee: 'human', placement: pick(3, 'Date', 'date') },
+        { id: 'print_name', type: 'text', label: 'Print name', assignee: 'agent', value: SIGNER, placement: pick(3, 'Print Name', 'text') },
       ],
     };
 
@@ -162,7 +164,7 @@ test('demo: a scripted agent places and fills fields on the flat NDA, and the hu
     const preview = await call('render_preview', { pdf_path: pdfPath, request });
     const images = preview.structuredContent['images'] as Array<{ page: number; field_ids: string[] }>;
     expect(images.map((image) => [image.page, [...image.field_ids].sort()])).toEqual([
-      [1, ['party_a', 'party_b']],
+      [1, ['effective_date', 'party_a', 'party_b']],
       [3, ['date', 'print_name', 'signature']],
     ]);
     expect(preview.content.filter((block) => block.type === 'image')).toHaveLength(2);
@@ -227,6 +229,7 @@ test('demo: a scripted agent places and fills fields on the flat NDA, and the hu
 
     const problems = watch(page);
     await openSignView(page, links[0]!);
+    await expect(page.getByTestId('field-box-effective_date')).toContainText(/^\d{4}-\d{2}-\d{2}/);
     await expect(page.getByTestId('field-box-party_a')).toContainText(USER_COMPANY);
     await expect(page.getByTestId('field-box-party_b')).toContainText(OTHER_PARTY);
     expect(problems).toEqual([]);

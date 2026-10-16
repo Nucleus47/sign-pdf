@@ -4,7 +4,7 @@ The demo uses two screen states. Capture both at desktop 1440 × 900 and mobile 
 
 | State | Route | Setup | Check |
 | --- | --- | --- | --- |
-| Prepare | `/` | Open the sample | Five fields, skipped-blank notice, and Continue to sign |
+| Prepare | `/` | Open the sample | Six fields, skipped-blank notice, and Continue to sign |
 | Sign | `/` | Open the sample, then Continue to sign | Human review and Edit fields |
 
 The [capture manifest](templates.json) and [setup](setup.mjs) use synthetic sample data.
