@@ -13,6 +13,8 @@ paths and a running production preview server. Use `--driver @playwright/test` f
 installed Playwright package. Wait for a PDF page canvas after the sign view opens. Screenshots stay local under the configured
 capture directory. The [demo browser tests](../../packages/web/e2e/demo-sample.spec.ts)
 check field counts, disclosure, signing controls, and automatic fit after a pane resize.
+The top-bar signing button uses the shared 44 px target size. The existing phone and
+desktop touch-target regression tests also cover it.
 
 See [the demo](../demo.md) for the blank inventory and the [browser agent guide](../browser-agent.md)
 for the hand-off rules.
