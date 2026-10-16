@@ -16,6 +16,24 @@
 /fonts/*
   Cache-Control: public, max-age=31536000, immutable
 
-# Prevent caching of HTML
+# Prevent edge caching of HTML and unhashed static files
+/
+  Cache-Control: no-cache, no-store, must-revalidate
+
 /index.html
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/*.md
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/*.txt
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/*.json
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/*.pdf
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/*.webmanifest
   Cache-Control: no-cache, no-store, must-revalidate

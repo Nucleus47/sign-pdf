@@ -162,6 +162,15 @@ Do this when bots get past the rate limits and the daily caps, or when the caps 
 
 Set all three together. With `on` and no site key, the app shows no widget and every login is refused without a word. With `on` and no secret, every login is refused and the log says `relay: turnstile-misconfigured`.
 
+## Static assets and edge caching
+
+The Worker serves `packages/web/dist` with Workers Static Assets (`packages/relay/wrangler.jsonc`).
+
+- `not_found_handling` is `"none"`. The web app uses `#request=`, `#relay=`, and `#session=` hash fragments on `/`, so `GET /` serves `index.html` and any missing path returns `404 Not Found` instead of falling back to `index.html`.
+- Without an explicit `Cache-Control` rule in `packages/web/public/_headers`, Workers Static Assets sends `Cache-Control: public, max-age=0, must-revalidate`. On the `silv.app` Cloudflare zone, the zone-level `http_request_cache_settings` ruleset caches `public` responses at the edge (`cf-cache-status: HIT`), which kept unhashed files stale for minutes after a deploy (issue #20).
+- `packages/web/public/_headers` sets `Cache-Control: no-cache, no-store, must-revalidate` on `/`, `/index.html`, `/*.md`, `/*.txt`, `/*.json`, `/*.pdf`, and `/*.webmanifest` so Cloudflare never stores them at the edge. Hashed bundles under `/assets/*`, `/*.worker.*.js`, and `/fonts/*` stay `public, max-age=31536000, immutable`.
+- `.github/workflows/deploy.yml` verifies after every deploy that `/demo-request.json` and `/skill.md` match the built files and that a missing path returns `404`.
+
 ## Local development
 
 `pnpm --filter @sign-pdf/relay dev` runs `wrangler dev` with `RELAY_MODE=on`, `TURNSTILE_MODE=off`, `MAIL_TRANSPORT=dev-outbox` and a dev-only session secret. Mail goes to the local R2 emulator; read it at `GET /relay/dev/outbox`. The default origin is `http://127.0.0.1:8787`; on another port, pass `--port <port> --var PUBLIC_ORIGIN:http://127.0.0.1:<port>` so emailed links point at the local server. A bare `wrangler dev` uses the production vars, so every relay path answers 404 until you pass `--var RELAY_MODE:on`.

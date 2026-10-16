@@ -46,15 +46,15 @@ jobs:
             echo "::notice::main is now $tip; skipping the deploy of $TESTED. The newer commit's CI run deploys it."
             echo "current=false" >> "$GITHUB_OUTPUT"
           fi
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         if: steps.tip.outputs.current == 'true'
         with:
           # The commit CI tested, not whatever main points to now.
           ref: ${{ github.event.workflow_run.head_sha }}
           persist-credentials: false
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
         if: steps.tip.outputs.current == 'true'
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         if: steps.tip.outputs.current == 'true'
         with:
           node-version: 22
@@ -68,7 +68,7 @@ jobs:
         env:
           # The commit stamp in error reports: the commit checked out and built above.
           APP_COMMIT: ${{ github.event.workflow_run.head_sha }}
-      - uses: cloudflare/wrangler-action@v3
+      - uses: cloudflare/wrangler-action@9acf94ace14e7dc412b076f2c5c20b8ce93c79cd # v3
         if: steps.tip.outputs.current == 'true'
         env:
           # Keep wrangler's logs in the runner's temp directory.
@@ -83,3 +83,28 @@ jobs:
           # Use the wrangler version pinned in the lockfile, installed above.
           packageManager: pnpm
           command: deploy
+      - name: Verify live static files match the build and missing files return 404
+        if: steps.tip.outputs.current == 'true'
+        env:
+          ORIGIN: https://sign.silv.app
+          TESTED: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          for asset in demo-request.json skill.md; do
+            matched=false
+            for attempt in $(seq 1 10); do
+              if curl -fsSL "$ORIGIN/$asset?v=$TESTED" -o "$RUNNER_TEMP/$asset" && cmp -s "packages/web/dist/$asset" "$RUNNER_TEMP/$asset"; then
+                matched=true
+                break
+              fi
+              sleep 3
+            done
+            if [ "$matched" != "true" ]; then
+              echo "::error::Live $ORIGIN/$asset does not match packages/web/dist/$asset after deploy"
+              exit 1
+            fi
+          done
+          status=$(curl -s -o /dev/null -w "%{http_code}" "$ORIGIN/missing-$TESTED.json")
+          if [ "$status" != "404" ]; then
+            echo "::error::Expected 404 for missing static file, got $status"
+            exit 1
+          fi

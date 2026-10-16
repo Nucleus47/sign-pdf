@@ -2,7 +2,7 @@
 // assets and answers the relay API under /relay/ (docs/relay.md). The _headers
 // file in the assets directory sets the security headers on every asset
 // response. Only /relay and /relay/* run the Worker script first; every other
-// path is served as an asset, and an unknown path gets index.html.
+// path is served as an asset, and an unknown path returns 404.
 //
 // The vars below are the production values. `pnpm dev` overrides the mail
 // transport with --var flags, so a local run never sends mail.
@@ -21,7 +21,7 @@
   "assets": {
     "directory": "../web/dist",
     "binding": "ASSETS",
-    "not_found_handling": "single-page-application",
+    "not_found_handling": "none",
     "run_worker_first": ["/relay", "/relay/*"]
   },
   "r2_buckets": [{ "binding": "BLOBS", "bucket_name": "sign-pdf-relay" }],
