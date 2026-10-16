@@ -46,7 +46,7 @@ jobs:
             echo "::notice::main is now $tip; skipping the deploy of $TESTED. The newer commit's CI run deploys it."
             echo "current=false" >> "$GITHUB_OUTPUT"
           fi
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         if: steps.tip.outputs.current == 'true'
         with:
           # The commit CI tested, not whatever main points to now.
