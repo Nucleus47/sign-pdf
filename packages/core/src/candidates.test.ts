@@ -87,6 +87,16 @@ describe('findPlacementCandidates', () => {
     expect(candidates.every((candidate) => ['high', 'medium', 'low'].includes(candidate.confidence) && candidate.reason.length > 0)).toBe(true);
   });
 
+  it('collapses a prose date line without a year stub into one date candidate', async () => {
+    const doc = await PDFDocument.create();
+    const font = await doc.embedFont(StandardFonts.Helvetica);
+    const page = doc.addPage([612, 792]);
+    page.drawText('as of the ___ day of ________________, 20', { x: 72, y: 700, size: 12, font });
+    const pdf = await doc.save();
+    const { candidates } = findPlacementCandidates(await inspectPdf(pdf));
+    expect(candidates.map(summary)).toEqual([['line', 'day of', 'date']]);
+  });
+
   it('suggests readable anchors, with an occurrence only where the label repeats', async () => {
     const pdf = await formPdf();
     const { candidates } = findPlacementCandidates(await inspectPdf(pdf));
@@ -317,6 +327,34 @@ describe('the sample NDA', () => {
     });
     // The signature line "__________________________" starts at x 185.8 on the line at y 102.53.
     expect(rects[candidates.indexOf(page3[0] as PlacementCandidate)]?.x).toBeCloseTo(185.8, 0);
+  });
+
+  it('treats the split Effective Date line on page 1 as one high-confidence date candidate when flattened', async () => {
+    // The flattened demo NDA has no AcroForm fields, so the sample's widgets,
+    // which name the page text ("day of", "20"), do not cover the underscore runs.
+    const pdf = new Uint8Array(await readFile(new URL('../../web/public/sample-nda.pdf', import.meta.url)));
+    const inspection = await inspectPdf(pdf);
+    const { candidates } = findPlacementCandidates({ ...inspection, acroFields: [] });
+    const page1 = candidates.filter((candidate) => candidate.page === 1);
+    // The day stub and the year stub of "___ day of ____________, 20___" drop out,
+    // leaving one date candidate on the long blank, labelled "day of".
+    expect(page1.map(summary)).toEqual([
+      ['line', 'day of', 'date'],
+      ['line', '_____________________', undefined],
+      ['line', 'Party A", and', undefined],
+      ['line', 'shall, for a period of', undefined],
+    ]);
+    expect(page1[0]?.confidence).toBe('high');
+    expect(page1[0]?.suggested.placement).toEqual({
+      kind: 'anchor',
+      text: 'day of',
+      page: 1,
+      align: 'right',
+      dx: 5.66,
+      dy: -1,
+      width: 118.96,
+      height: 14,
+    });
   });
 });
 

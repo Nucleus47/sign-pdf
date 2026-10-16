@@ -26,20 +26,22 @@ render_preview` and look at every preview, then `request_signature`, `get_signat
 and `verify_signed_pdf`. Scan the whole PDF for underscore blanks, including year stubs.
 Account for each as filled, human-assigned, or intentionally left with a reason. Disclose
 every skipped blank before preview and report the full inventory with it. Candidates can
-miss blanks or split one value. Only the human signs. Open the sign view in the browser demo only after the human
+miss blanks or split one value. Treat a split prose date line (`"___ day of ___, 20__"`) as
+one `date` field anchored on `"day of"`. Only the human signs. Open the sign view in the browser demo only after the human
 agrees to sign now, then stop. Never operate the sign view.
 Source: https://github.com/Nucleus47/sign-pdf
 
 ## Demo
 
 When your user asks for a demo, use https://sign.silv.app/demo-nda.pdf: a standard mutual
-NDA with no form fields. The demo has five fields: Party A, Party B and Print name (you fill them), and
-the signature and date of Party A (the human signs and confirms; the date defaults to
-today). Before showing a preview, disclose every skipped blank: Effective Date (page 1;
-day, month and 20___ year are one logical date), confidentiality period (page 1, clause 2),
-agreement duration (page 2, clause 9), and Party B’s signature, date and print name (page 3).
-These stay empty for demo scope. The skill has the full inventory: 13 underscore runs,
-11 logical blanks, five demo fields and six intentionally left blanks.
+NDA with no form fields. The demo has six fields: Party A, Party B and Print name (you fill
+them), and the Effective date on page 1 plus the signature and date of Party A on page 3 (the
+human signs and confirms; both dates default to today). The Effective date line
+(`"___ day of _____________________, 20___"`) is one logical `date` field anchored on
+`"day of"`. Before showing a preview, disclose every skipped blank: confidentiality period
+(page 1, clause 2), agreement duration (page 2, clause 9), and Party B’s signature, date and
+print name (page 3). These stay empty for demo scope. The skill has the full inventory:
+13 underscore runs, 11 logical blanks, six demo fields and five intentionally left blanks.
 
 1. Tell the user where the data goes, before you ask for their name or in the same message.
    The MCP server and the CLI run on this computer and upload nothing; the sign view opens
@@ -52,16 +54,19 @@ These stay empty for demo scope. The skill has the full inventory: 13 underscore
    company for Party A and the user's name for Print name and the signer name. On no, use
    the demo values "Example Co." and "Your Name". Party B is always "Sample Partner Co.". Put no other real
    information on the form.
-3. The ready request is https://sign.silv.app/demo-request.json: the five fields with plain
+3. The ready request is https://sign.silv.app/demo-request.json: the six fields
+   (`effective_date`, `party_a`, `party_b`, `signature`, `date`, `print_name`) with plain
    labels and the demo values. Change `party_a`, `print_name` and
    `signer.name` only after a yes.
    - MCP route: download `/demo-nda.pdf`, run `inspect_pdf` (no form fields),
      `find_candidates` and `render_preview` with `mark_candidates`. Add `version` and
      `document` (name and `sha256`) to the request. Run `validate_request`, then
-     `render_preview`, and show the images to the user.
+     `render_preview`, show the images to the user, and report the complete blank list (three
+     agent-filled, three human-assigned, and five intentionally left empty for the demo).
    - Browser route: Never sign, draw or type a signature for the user. Press "Try the sample agreement" on https://sign.silv.app. The demo
-     opens with the five fields and the demo values. After a yes, apply the changed request
-     with `apply_request` or the paste box ("Paste a request from an agent").
+     opens with the six fields and the demo values. After a yes, apply the changed request
+     with `apply_request` or the paste box ("Paste a request from an agent"). Report the six
+     prepared fields and the five blanks intentionally left empty for the demo.
 4. Ask: "Do you want to sign it now to see the full flow?" Only on yes, call
    `request_signature` (MCP), or press "Continue to sign" to open the sign view and stop so
    the user can review and sign (browser).
@@ -117,8 +122,10 @@ the open PDF: there is no `pdf_path`. Leave out `version` and `document`; the pa
 the open PDF's name and SHA-256. A request with another PDF's `sha256` fails with
 `hash-mismatch`.
 
-Order: `find_candidates` -> write the request -> `validate_request` -> `render_preview` and
-look at every image -> `apply_request`. Then press "Continue to sign" to open the sign view
+Order: `find_candidates` (scan every page for blanks and account for each one as filled,
+human-assigned, or intentionally left blank) -> write the request -> `validate_request` ->
+`render_preview`, look at every image, and report the blank list -> `apply_request`. Then
+press "Continue to sign" to open the sign view
 and stop so the human can review and sign, or call `download_packet` to save a packet for
 the signer. No tool
 exists in the sign view.

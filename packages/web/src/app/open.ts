@@ -238,7 +238,7 @@ export async function openFiles(files: readonly File[]): Promise<Opened> {
   return fail(`“${first.name}” is not a PDF. Choose a file that ends in .pdf.`, 'not-a-pdf', factsOf(first));
 }
 
-/** The sample is the agent demo (docs/demo.md): the NDA with no form fields, and its five demo fields. */
+/** The sample is the agent demo (docs/demo.md): the NDA with no form fields, and its six demo fields. */
 export const SAMPLE_NAME = 'demo-nda.pdf';
 export const SAMPLE_REQUEST = 'demo-request.json';
 

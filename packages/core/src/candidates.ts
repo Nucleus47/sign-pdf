@@ -97,7 +97,7 @@ const floor2 = (n: number): number => Math.floor(n * 100) / 100;
 export function typeHint(label: string): FieldType | undefined {
   const words = label.toLowerCase().replace(/[_\-.\d]+/g, ' ');
   if (/\binitials?\b/.test(words)) return 'initials';
-  if (/\bdated?\b/.test(words)) return 'date';
+  if (/\b(?:dated?|day of)\b/.test(words)) return 'date';
   if (/\bsignature\b|\bsigned\b|\bsign here\b/.test(words)) return 'signature';
   if (/\b(name|title|company|address|e ?mail|phone|city|state|zip)\b/.test(words)) return 'text';
   return undefined;
@@ -172,10 +172,27 @@ function scanLine(line: Line, page: PageInfo): Found[] {
       found.push({ kind: 'label', text, rect, type, target, label: { text, rect }, footprint: target });
     }
   };
-  for (const match of lines) {
+  for (const [index, match] of lines.entries()) {
     const from = match.index;
     const to = from + match[0].length;
     consumeColonLabels(from);
+    // A prose date line ("___ day of ____________, 20___") is one logical date,
+    // not three blanks: its box sits on the long blank after "day of". The short
+    // day stub before the words and the year stub after them are parts of that
+    // same date, so skip them and keep "day of" as the surviving run's label.
+    const next = lines[index + 1];
+    const beforeDayOf = next !== undefined && line.text.slice(to, next.index).trim() === 'day of';
+    const prev = lines[index - 1];
+    const prevPrev = lines[index - 2];
+    const afterDayOfYearPrefix =
+      prev !== undefined &&
+      /^\s*,?\s*(?:19|20)\s*$/.test(line.text.slice(prev.index + prev[0].length, from)) &&
+      ((prevPrev !== undefined && line.text.slice(prevPrev.index + prevPrev[0].length, prev.index).trim() === 'day of') ||
+        /\bday of\s*$/.test(line.text.slice(0, prev.index)));
+    if (beforeDayOf || afterDayOfYearPrefix) {
+      boundary = to;
+      continue;
+    }
     const underline = spanRect(line, page.page, from, to);
     const span = trimSpan(line, boundary, from);
     boundary = to;

@@ -364,7 +364,7 @@ for (const size of [
 
     await page.getByTestId('load-sample').click();
     await expect(page.getByTestId('app-root')).toHaveAttribute('data-state', 'preparing');
-    await expect(page.getByTestId('field-count')).toHaveText('5');
+    await expect(page.getByTestId('field-count')).toHaveText('6');
     await addFieldByForm(page, { type: 'text', label: 'Party A name', page: 3, x: 140, y: 142, width: 170, height: 16 });
     expect(await smallButtons(page, size.min), 'prepare').toEqual([]);
 

@@ -469,8 +469,8 @@ export function Prepare({ document: doc, state, dispatch, onContinue, initialReq
           {demo && (
             <div className="notice demo-notice" data-testid="demo-notice">
               <p>
-                <strong>Demo.</strong> This sample NDA has five fields with demo values. Party A, Party B,
-                the date and your name are filled in. You sign and confirm.
+                <strong>Demo.</strong> This sample NDA has six fields with demo values. Party A, Party B,
+                your name and both dates are filled in. You sign and confirm.
               </p>
               <p className={UNTRUSTED_TEXT_CLASS}>{displayText(state.details.note)}</p>
               <p>The PDF and what you type stay in this browser. Nothing is uploaded.</p>
