@@ -59,6 +59,13 @@ export function Home({ busy, error, notice, onFiles, onPdfWithRequest, onSample,
             ? 'Everything happens in your browser. Nothing is uploaded unless you choose to email it.'
             : 'Everything happens in your browser. Nothing is uploaded.'}
         </p>
+        <p className="home-agent-hint" data-testid="home-agent-hint">
+          AI agent? Read{' '}
+          <a href={`${import.meta.env.BASE_URL}skill.md`} data-testid="skill-link">
+            /skill.md
+          </a>{' '}
+          first.
+        </p>
       </section>
 
       {notice && (

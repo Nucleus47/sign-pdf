@@ -194,11 +194,30 @@ export const BROWSER_ONLY_TOOLS = {
   }),
 };
 
-export const BROWSER_TOOLS = { ...SHARED_TOOLS, ...BROWSER_ONLY_TOOLS };
+/** Rule appended to every browser tool description and workflow. */
+export const BROWSER_TOOL_RULE =
+  'Only the human signs: never sign, draw or type a signature, or tick the consent box for the user. For a demo, read /skill.md first.';
+
+function withBrowserRule<Shape extends z.ZodRawShape>(tool: ToolDefinition<Shape>): ToolDefinition<Shape> {
+  return { ...tool, description: `${tool.description} ${BROWSER_TOOL_RULE}` };
+}
+
+export const BROWSER_TOOLS = {
+  inspect_pdf: withBrowserRule(SHARED_TOOLS.inspect_pdf),
+  find_candidates: withBrowserRule(SHARED_TOOLS.find_candidates),
+  get_request_schema: withBrowserRule(SHARED_TOOLS.get_request_schema),
+  validate_request: withBrowserRule(SHARED_TOOLS.validate_request),
+  render_preview: withBrowserRule(SHARED_TOOLS.render_preview),
+  apply_request: withBrowserRule(BROWSER_ONLY_TOOLS.apply_request),
+  get_state: withBrowserRule(BROWSER_ONLY_TOOLS.get_state),
+  download_packet: withBrowserRule(BROWSER_ONLY_TOOLS.download_packet),
+  download_request: withBrowserRule(BROWSER_ONLY_TOOLS.download_request),
+};
 export type BrowserToolName = keyof typeof BROWSER_TOOLS;
 
 /** Workflow for an agent using the browser agent API. */
 export const BROWSER_WORKFLOW =
+  `${BROWSER_TOOL_RULE} ` +
   'Workflow: find_candidates (or inspect_pdf) -> write a request (get_request_schema) -> validate_request -> render_preview, and LOOK at every image -> apply_request. ' +
   'Then the human reviews and signs in the page ("Continue to sign"), or download_packet saves a packet for a signer. ' +
   'You never sign: no tool can sign, fill a signature or initials, or tick the consent, and you must not operate the sign view. ' +

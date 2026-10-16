@@ -534,6 +534,12 @@ div.form-error {
   color: var(--color-ink-soft);
 }
 
+.home-agent-hint {
+  margin-top: var(--space-2);
+  font-size: var(--text-s);
+  color: var(--color-ink-soft);
+}
+
 .drop-zone,
 .card {
   display: grid;
