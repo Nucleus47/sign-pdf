@@ -713,7 +713,7 @@ function Review({ job, resolved, onSigned, onBackToPrepare, onStartOver }: Revie
     return '';
   };
 
-  // Top right of the app bar: the way between the hand-off screen and the document.
+  // Top right of the app bar: the way between the hand-off screen and the document, or back to the fields.
   const barControl =
     handedOver && barSlot
       ? createPortal(
@@ -726,7 +726,14 @@ function Review({ job, resolved, onSigned, onBackToPrepare, onStartOver }: Revie
           </button>,
           barSlot,
         )
-      : null;
+      : onBackToPrepare && barSlot
+        ? createPortal(
+            <button type="button" className="button quiet" data-testid="app-bar-prepare" onClick={onBackToPrepare}>
+              ← Edit fields
+            </button>,
+            barSlot,
+          )
+        : null;
 
   if (handedOver && !viewing) {
     const address = currentAppAddress();

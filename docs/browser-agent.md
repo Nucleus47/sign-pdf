@@ -39,7 +39,7 @@ Rules for every tool:
 
 ## What the agent cannot do
 
-No tool signs, fills a signature or initials, or ticks the consent. The API and the WebMCP tools are removed when the human presses "Continue to sign", so no tool exists in the sign view. The only write is the draft on the page, which the human reviews. Every browser tool description and `window.signPdf.workflow` say that only the human signs and point to `/skill.md` for the demo.
+No tool signs, fills a signature or initials, or ticks the consent. When the fields are ready, "Continue to sign" shows in the top bar and the panel header; pressing it opens the sign view (`data-state="awaiting-human"`), removes the API and the WebMCP tools, and shows "← Edit fields" in the top bar. The agent stops once the sign view opens. The only write is the draft on the page, which the human reviews. Every browser tool description and `window.signPdf.workflow` say that only the human signs and point to `/skill.md` for the demo.
 
 ## WebMCP
 

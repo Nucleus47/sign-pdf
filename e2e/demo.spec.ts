@@ -81,9 +81,17 @@ test('demo: a scripted agent places and fills fields on the flat NDA, and the hu
     await Promise.all([mcp.server.connect(serverSide), agent.connect(clientSide)]);
 
     // Step 2: the PDF has no form fields.
-    const inspected = (await call('inspect_pdf', { pdf_path: pdfPath, include_text: false })).structuredContent;
+    const inspected = (await call('inspect_pdf', { pdf_path: pdfPath, detail: 'full' })).structuredContent;
     expect(inspected['sha256']).toBe(DEMO_NDA_SHA256);
     expect((inspected['untrusted_document_content'] as { form_fields: unknown[] }).form_fields).toEqual([]);
+    // Scan every printed underscore run, not only candidates or chosen fields.
+    // The first three runs form one logical Effective Date.
+    const text = (inspected['untrusted_document_content'] as { text: Array<{ page: number; text: string }> }).text;
+    const runsByPage = [1, 2, 3].map((pageNumber) =>
+      text.filter((run) => run.page === pageNumber).reduce((count, run) => count + [...run.text.matchAll(/_+/g)].length, 0),
+    );
+    expect(runsByPage).toEqual([6, 1, 6]);
+
 
     // Step 3: candidates, then a marked preview of every page.
     const found = (await call('find_candidates', { pdf_path: pdfPath })).structuredContent;

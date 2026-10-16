@@ -23,7 +23,11 @@ restart the client. The skill has the full check.
 
 The agent flow is `inspect_pdf -> find_candidates -> draft_request -> validate_request ->
 render_preview` and look at every preview, then `request_signature`, `get_signature_status`
-and `verify_signed_pdf`. Only the human signs: never sign or open the sign view yourself.
+and `verify_signed_pdf`. Scan the whole PDF for underscore blanks, including year stubs.
+Account for each as filled, human-assigned, or intentionally left with a reason. Disclose
+every skipped blank before preview and report the full inventory with it. Candidates can
+miss blanks or split one value. Only the human signs. Open the sign view in the browser demo only after the human
+agrees to sign now, then stop. Never operate the sign view.
 Source: https://github.com/Nucleus47/sign-pdf
 
 ## Demo
@@ -31,7 +35,11 @@ Source: https://github.com/Nucleus47/sign-pdf
 When your user asks for a demo, use https://sign.silv.app/demo-nda.pdf: a standard mutual
 NDA with no form fields. The demo has five fields: Party A, Party B and Print name (you fill them), and
 the signature and date of Party A (the human signs and confirms; the date defaults to
-today). Do not place fields on the other blanks. The skill has the full demo script.
+today). Before showing a preview, disclose every skipped blank: Effective Date (page 1;
+day, month and 20___ year are one logical date), confidentiality period (page 1, clause 2),
+agreement duration (page 2, clause 9), and Party B’s signature, date and print name (page 3).
+These stay empty for demo scope. The skill has the full inventory: 13 underscore runs,
+11 logical blanks, five demo fields and six intentionally left blanks.
 
 1. Tell the user where the data goes, before you ask for their name or in the same message.
    The MCP server and the CLI run on this computer and upload nothing; the sign view opens
@@ -55,7 +63,8 @@ today). Do not place fields on the other blanks. The skill has the full demo scr
      opens with the five fields and the demo values. After a yes, apply the changed request
      with `apply_request` or the paste box ("Paste a request from an agent").
 4. Ask: "Do you want to sign it now to see the full flow?" Only on yes, call
-   `request_signature` (MCP), or tell the user to press "Continue to sign" (browser).
+   `request_signature` (MCP), or press "Continue to sign" to open the sign view and stop so
+   the user can review and sign (browser).
 
 ## About
 
@@ -109,8 +118,9 @@ the open PDF's name and SHA-256. A request with another PDF's `sha256` fails wit
 `hash-mismatch`.
 
 Order: `find_candidates` -> write the request -> `validate_request` -> `render_preview` and
-look at every image -> `apply_request`. Then ask the human to check the fields and press
-"Continue to sign", or call `download_packet` to save a packet for the signer. No tool
+look at every image -> `apply_request`. Then press "Continue to sign" to open the sign view
+and stop so the human can review and sign, or call `download_packet` to save a packet for
+the signer. No tool
 exists in the sign view.
 
 ## What is reserved for the human

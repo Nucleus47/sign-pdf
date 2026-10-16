@@ -1,6 +1,6 @@
 {
   "title": "Mutual NDA (demo)",
-  "note": "This is a demo with demo values. It is not a real agreement. The PDF stays on this device.",
+  "note": "This is a demo with demo values. It is not a real agreement. The PDF stays on this device. Five demo fields only. Intentionally left empty: Effective Date (page 1: day, month and year as one date), confidentiality period (page 1, clause 2), agreement duration (page 2, clause 9), and Party B’s signature, date and print name (page 3).",
   "signer": { "name": "Your Name" },
   "fields": [
     {
