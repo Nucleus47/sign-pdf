@@ -476,6 +476,32 @@ describe('finalizeDocument', () => {
     expect((await verifySignedPdf(result.pdf)).hasAuditRecord).toBe(true);
   });
 
+  // Forms converted from XFA can carry a /DA with no font (no Tf operator), or no /DA at all.
+  it.each([
+    ['a /DA with no Tf operator', '0.000 0.000 0.502 rg'],
+    ['a /DA with a malformed Tf operator', '/Helv 8.00Tf 0 g'],
+    ['no /DA', undefined],
+  ])('fills a human text form field that has %s', async (_case, da) => {
+    const doc = await PDFDocument.create();
+    const page = doc.addPage([612, 792]);
+    const field = doc.getForm().createTextField('topmostSubform[0].Page1[0].f1_04[0]');
+    field.addToPage(page, { x: 72, y: 600, width: 220, height: 22, borderWidth: 0 });
+    if (da === undefined) field.acroField.dict.delete(PDFName.of('DA'));
+    else field.acroField.setDefaultAppearance(da);
+    const pdf = await doc.save();
+
+    const resolved = await resolveRequest(
+      pdf,
+      await requestFor(pdf, [
+        { id: 'ein', type: 'text', assignee: 'human', label: 'EIN', placement: { kind: 'acroField', name: 'topmostSubform[0].Page1[0].f1_04[0]' } },
+      ]),
+    );
+    const result = await finalizeDocument(pdf, resolved, humanInput({ values: { ein: '12-3456789' } }));
+    const after = await inspectPdf(result.pdf);
+    expect(after.acroFields).toEqual([]);
+    expectInside(after.text.find((item) => item.text === '12-3456789'), { page: 1, x: 72, y: 792 - 600 - 22, width: 220, height: 22 });
+  });
+
   /** Stored page 400 wide and 600 high unless `prepare` says otherwise. `box` is the visible native box. */
   interface PageCase {
     name: string;
