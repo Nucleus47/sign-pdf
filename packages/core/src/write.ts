@@ -336,6 +336,21 @@ export async function planFields(
   return planned;
 }
 
+/** The font operator pdf-lib's setFontSize looks for in a field's /DA (its own `tfRegex`). */
+const DA_FONT_OPERATOR = /\/([^\0\t\n\f\r ]+)[\0\t\n\f\r ]*(\d*\.\d+|\d+)?[\0\t\n\f\r ]+Tf/;
+
+/**
+ * Give a text field's /DA a font operator when it has none, or no /DA at all, as forms
+ * converted from XFA often do; pdf-lib cannot set a font size without one. The name is a
+ * placeholder: the appearance is built with the embedded font, and the field is flattened.
+ */
+function ensureFontInDefaultAppearance(field: PDFTextField): void {
+  const da = field.acroField.getDefaultAppearance() ?? '';
+  if (DA_FONT_OPERATOR.test(da)) return;
+  // Keep a colour from a /DA that has no Tf at all; drop one with a malformed Tf.
+  field.acroField.setDefaultAppearance(da.includes('Tf') || !da.trim() ? '/Helv 0 Tf 0 g' : `/Helv 0 Tf ${da.trim()}`);
+}
+
 /** Paint a form field's appearance into the page content, then remove the field. */
 function flattenField(doc: PDFDocument, form: PDFForm, field: PDFTextField | PDFCheckBox, fieldId: string): void {
   const pages = doc.getPages();
@@ -466,6 +481,7 @@ export async function finalizeDocument(
           acro.defaultUpdateAppearances();
         } else {
           if (!font || !plan.text) throw new Error('no text was prepared');
+          ensureFontInDefaultAppearance(acro);
           // The size the value was checked at; the form field does its own alignment and wrapping.
           acro.setFontSize(plan.text.layout.size);
           acro.setText(plan.text.value);
